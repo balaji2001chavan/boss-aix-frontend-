@@ -3,168 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <title>Boss AIX</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
   <style>
-    body {
-      margin: 0;
-      background: #020617;
-      font-family: system-ui, Arial;
-      color: #e5e7eb;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+    body { font-family: Arial; background:#0f172a; color:white; }
+    #chat { max-width:600px; margin:40px auto; }
+    input, button {
+      width:100%; padding:12px; font-size:16px; margin-top:10px;
     }
-
-    .app {
-      width: 100%;
-      max-width: 900px;
-      height: 95vh;
-      display: flex;
-      flex-direction: column;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    h2 {
-      text-align: center;
-      margin: 6px 0 10px;
-    }
-
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      border-radius: 8px;
-      padding: 10px;
-      background: #020617;
-    }
-
-    .msg {
-      margin-bottom: 10px;
-      line-height: 1.4;
-    }
-
-    .user { color: #38bdf8; }
-    .boss { color: #22c55e; }
-
-    .input-row {
-      display: flex;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      font-size: 15px;
-    }
-
-    button {
-      padding: 12px 14px;
-      border-radius: 8px;
-      border: none;
-      background: #22c55e;
-      color: #022c22;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button.secondary {
-      background: #334155;
-      color: #e5e7eb;
-    }
+    .msg { margin:8px 0; }
+    .you { color:#38bdf8; }
+    .boss { color:#22c55e; }
   </style>
 </head>
-
 <body>
-<div class="app">
+
+<div id="chat">
   <h2>🤖 Boss AIX</h2>
+  <div id="messages"></div>
 
-  <div id="chat"></div>
-
-  <div class="input-row">
-    <input id="input" placeholder="Boss AIX ला सांगा…" />
-    <button onclick="sendMessage()">Send</button>
-    <button class="secondary" onclick="startVoice()">🎤</button>
-  </div>
+  <input id="input" placeholder="Boss AIX ला सांगा..." />
+  <button onclick="send()">SEND</button>
 </div>
 
 <script>
-  // 🔹 BACKEND URL (हे backend Render URL असलाच पाहिजे)
- const BACKEND_URL =
-  "https://boss-aix-backend-x0lp.onrender.com/api/boss/command";
+const BACKEND_URL = "https://boss-aix-backend-x0lp.onrender.com";
 
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
+function addMsg(text, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerText = text;
+  document.getElementById("messages").appendChild(div);
+}
 
-  function addMessage(text, cls) {
-    const div = document.createElement("div");
-    div.className = "msg " + cls;
-    div.innerHTML = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
+async function send() {
+  const text = input.value;
+  addMsg("You: " + text, "you");
+  input.value = "";
+
+  try {
+    const res = await fetch(BACKEND_URL + "/api/boss/command", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+    addMsg("Boss AIX: " + JSON.stringify(data), "boss");
+  } catch (e) {
+    addMsg("❌ Backend reachable नाही", "boss");
   }
-
-  function speak(text) {
-    if (!window.speechSynthesis) return;
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "mr-IN";
-    u.rate = 1;
-    u.pitch = 1;
-    speechSynthesis.speak(u);
-  }
-
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMessage("<b>You:</b> " + text, "user");
-    input.value = "";
-
-    try {
-      const res = await fetch(BACKEND_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
-      });
-
-      if (!res.ok) throw new Error("Backend error");
-
-      const data = await res.json();
-      const reply = data.reply || "मी ऐकलं, पण उत्तर तयार नाही.";
-
-      addMessage("<b>Boss AIX:</b> " + reply, "boss");
-      speak(reply);
-
-    } catch (err) {
-      addMessage("<b>Boss AIX:</b> ❌ Backend reachable नाही", "boss");
-    }
-  }
-
-  // 🔹 VOICE INPUT
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recog = SR ? new SR() : null;
-
-  if (recog) {
-    recog.lang = "mr-IN";
-    recog.onresult = e => {
-      input.value = e.results[0][0].transcript;
-      sendMessage();
-    };
-  }
-
-  function startVoice() {
-    if (recog) recog.start();
-    else alert("Voice support उपलब्ध नाही");
-  }
-
-  // 🔹 WELCOME
-  addMessage("<b>Boss AIX:</b> मी तयार आहे. आज काय काम करू?", "boss");
+}
 </script>
+
 </body>
 </html>
