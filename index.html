@@ -1,65 +1,37 @@
-<!DOCTYPE html>
-<html lang="mr">
-<head>
-  <meta charset="UTF-8">
-  <title>Boss AIX</title>
-  <style>
-    body { background:#0f172a; color:white; font-family:Arial }
-    .box { max-width:600px; margin:40px auto }
-    input,button { width:100%; padding:12px; margin-top:10px }
-    .you { color:#38bdf8 }
-    .boss { color:#22c55e }
-  </style>
-</head>
-<body>
-
-<div class="box">
-  <h2>🤖 Boss AIX</h2>
-  <div id="chat"></div>
-  <input id="msg" placeholder="Boss AIX ला आदेश द्या..." />
-  <button onclick="send()">SEND</button>
-</div>
-
-<script>
-const API = "https://boss-aix-backend-x0lp.onrender.com/api/boss/command";
-let lastPlan = null;
-
-function add(text, cls){
-  const d=document.createElement("div");
-  d.className=cls;
-  d.innerText=text;
-  chat.appendChild(d);
-}
-
 async function send(){
   const text = msg.value;
-  msg.value="";
-  add("You: "+text,"you");
+  msg.value = "";
+
+  add("You: " + text, "you");
 
   const payload = lastPlan
-    ? { message:text, approve:true }
-    : { message:text };
+    ? { message: text, approve: true }
+    : { message: text };
 
-  try{
-    const r = await fetch(API,{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify(payload)
+  try {
+    const r = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
+
     const data = await r.json();
 
-    if(data.type==="PLAN"){
-      lastPlan=true;
-      add("Boss AIX: "+data.plan,"boss");
+    // ✅ THIS IS THE FIX
+    if (data.text) {
+      add("Boss AIX: " + data.text, "boss");
     } else {
-      lastPlan=null;
-      add("Boss AIX: "+data.result,"boss");
+      add("Boss AIX: (रिकामा प्रतिसाद)", "boss");
     }
-  }catch(e){
-    add("❌ Backend reachable नाही","boss");
+
+    if (data.step === "PLAN") {
+      lastPlan = true;
+      add("Boss AIX: " + data.ask, "boss");
+    } else {
+      lastPlan = false;
+    }
+
+  } catch (e) {
+    add("❌ Backend reachable नाही", "boss");
   }
 }
-</script>
-
-</body>
-</html>
