@@ -23,7 +23,12 @@
   <input id="input" placeholder="Boss AIX ला सांगा..." />
   <button onclick="send()">SEND</button>
 </div>
-
+<script>
+fetch("https://boss-aix-backend-x0lp.onrender.com")
+  .then(r => r.json())
+  .then(d => console.log("BACKEND OK:", d))
+  .catch(e => console.error("BACKEND FAIL:", e));
+</script>
 <script>
 const BACKEND_URL = "https://boss-aix-backend-x0lp.onrender.com";
 
