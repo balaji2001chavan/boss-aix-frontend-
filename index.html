@@ -31,25 +31,25 @@ function add(text, who){
    box.scrollTop = box.scrollHeight;
 }
 
-async function send(){
-  const text = document.getElementById("msg").value;
-  if(!text) return;
-  add("You: " + text, "you");
-  document.getElementById("msg").value = "";
+async function send() {
+    const text = msg.value;
+    msg.value = "";
 
-  try{
-    const r = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type":"application/json" },
-      body: JSON.stringify({ message: text })
-    });
+    add("You: " + text, "you");
 
-    const data = await r.json();
-    add("Boss AIX: " + data.reply, "boss");
+    try {
+        const r = await fetch("https://boss-aix-backend.onrender.com/api/aix", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
+        });
 
-  }catch(e){
-    add("Boss AIX: ❌ Backend reachable नाही", "boss");
-  }
+        const data = await r.json();
+        add(data.reply || "Boss AIX: रिकामा प्रतिसाद", "boss");
+
+    } catch (err) {
+        add("Boss AIX: Backend reachable नाही ❌", "boss");
+    }
 }
 </script>
 
