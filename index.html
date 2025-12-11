@@ -1,92 +1,95 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-    <meta charset="UTF-8" />
-    <title>Boss AIX – तुमचा Smart AI मित्र</title>
-    <style>
-        body {
-            background: #0d0d0d;
-            color: #e6e6e6;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
-        #chat {
-            width: 100%;
-            height: 430px;
-            overflow-y: auto;
-            border: 1px solid #444;
-            padding: 10px;
-            background: #111;
-            border-radius: 8px;
-        }
-        .user { color: #66ccff; margin: 6px 0; }
-        .boss { color: #00ff88; margin: 6px 0; }
-        input, button {
-            padding: 12px;
-            font-size: 18px;
-            width: 100%;
-            margin-top: 10px;
-            border-radius: 6px;
-        }
-        button { background: #00ff88; border: 0; cursor: pointer; }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Boss AIX – तुमचा Smart AI Partner</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      font-family: Arial;
+      color: white;
+      padding: 20px;
+    }
+
+    .chat-box {
+      width: 100%;
+      height: 70vh;
+      border: 1px solid #444;
+      padding: 10px;
+      overflow-y: auto;
+      background: #111;
+      border-radius: 8px;
+    }
+
+    .you { color: #00eaff; margin: 10px 0; }
+    .boss { color: #00ff9d; margin: 10px 0; }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #00ff9d;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
 
 <h2>Boss AIX – तुमचा Smart AI मित्र</h2>
 
-<div id="chat"></div>
+<div class="chat-box" id="chat"></div>
 
-<input id="msg" placeholder="इथे बोला…" />
-<button onclick="send()">Send</button>
+<input id="msg" placeholder="इथे मेसेज टाइप करा..." />
+<button onclick="send()">SEND</button>
 
 <script>
-const backendURL = "https://boss-aix-backend.onrender.com";  // ⭐ BACKEND URL FIX
+  const backend = "https://boss-aix-backend.onrender.com/api/aix";
 
-function add(text, who) {
-    let box = document.getElementById("chat");
-    let div = document.createElement("div");
+  function add(text, who) {
+    const box = document.getElementById("chat");
+    const div = document.createElement("div");
     div.className = who;
     div.innerText = text;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
-}
+  }
 
-async function send() {
+  async function send() {
     const text = document.getElementById("msg").value.trim();
     if (!text) return;
 
-    add("You: " + text, "user");
+    add("You: " + text, "you");
     document.getElementById("msg").value = "";
 
     try {
-        const res = await fetch(backendURL + "/api/aix", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            mode: "cors",       // ⭐ Render साठी आवश्यक
-            body: JSON.stringify({
-                message: text,
-                owner: false
-            })
-        });
+      const r = await fetch(backend, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message: text })
+      });
 
-        const data = await res.json();
+      const data = await r.json();
 
-        // ⭐ ERROR PROTECTION
-        if (!data || !data.reply) {
-            add("Boss AIX: ❌ रिप्लाय मिळाला नाही", "boss");
-            return;
-        }
-
+      if (data.reply) {
         add("Boss AIX: " + data.reply, "boss");
+      } else {
+        add("Boss AIX: (रिकामा प्रतिसाद)", "boss");
+      }
 
     } catch (err) {
-        add("Boss AIX: ⚠️ Backend reachable नाही किंवा CORS Error", "boss");
+      add("Boss AIX: ❌ Backend पोहोचत नाही", "boss");
+      console.error(err);
     }
-}
+  }
 </script>
 
 </body>
