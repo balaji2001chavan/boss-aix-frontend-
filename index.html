@@ -1,49 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>Boss AIX</title>
-<style>
-body { font-family: Arial; background: #111; color: #0f0; padding: 20px; }
-#chat { white-space: pre-line; padding: 10px; border: 1px solid #0f0; margin-bottom: 10px; height: 300px; overflow-y: auto; }
-input { width: 80%; padding: 10px; }
-button { padding: 10px; }
-</style>
+  <title>Boss AIX – तुमचा Smart AI मित्र</title>
+  <style>
+    body { font-family: Arial; background:#111; color:#fff; padding:20px; }
+    #chat { height:400px; overflow-y:auto; border:1px solid #444; padding:10px; }
+    .you { color:#0f0; margin:5px; }
+    .boss { color:#0af; margin:5px; }
+  </style>
 </head>
 <body>
 
-<h2>Boss AIX – तुमचा स्मार्ट AI मित्र</h2>
+<h2>Boss AIX – तुमचा Smart AI मित्र</h2>
 
 <div id="chat"></div>
 
-<input id="msg" placeholder="इथे टाइप करा..." />
-<button onclick="send()">Send</button>
+<input id="msg" placeholder="इथे लिहा..." style="width:70%; padding:10px;">
+<button onclick="send()" style="padding:10px;">Send</button>
 
 <script>
-const chat = document.getElementById("chat");
+const backend = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
 
-function add(text) {
-  chat.innerText += text + "\n\n";
-  chat.scrollTop = chat.scrollHeight;
+function add(text, cls) {
+  const div = document.createElement("div");
+  div.className = cls;
+  div.textContent = text;
+  document.getElementById("chat").appendChild(div);
 }
 
 async function send() {
-  const val = document.getElementById("msg").value;
+  const text = document.getElementById("msg").value;
   document.getElementById("msg").value = "";
 
-  add("You: " + val);
+  add("You: " + text, "you");
 
   try {
-    const res = await fetch("https://boss-aix-backend-x01p.onrender.com/api/aix", {
+    const r = await fetch(backend, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: val })
+      body: JSON.stringify({ message: text }),
     });
 
-    const data = await res.json();
-    add("Boss AIX: " + (data.reply || "Error"));
-  } catch (e) {
-    add("Boss AIX: Backend reachable नाही ❌");
+    const data = await r.json();
+
+    add("Boss AIX: " + data.reply, "boss");
+  } catch (err) {
+    add("Boss AIX: ❌ Backend reachable नाही", "boss");
   }
 }
 </script>
