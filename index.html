@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Boss AIX - तुमचा AI मित्र</title>
-  <style>
-    body { font-family: Arial; background:#111; color:#fff; padding:20px; }
-    #chat { height:400px; overflow-y:auto; border:1px solid #444; padding:10px; }
-    .you { color:#0f0; margin:10px 0; }
-    .boss { color:#0af; margin:10px 0; }
-  </style>
+<title>Boss AIX – Smart Chat</title>
+<style>
+body { background:#111; color:white; font-family:Arial; }
+#chat { height:400px; overflow-y:scroll; padding:10px; border:1px solid #333; }
+.msg { margin:8px 0; }
+.you { color:#4CAF50; }
+.boss { color:#00BFFF; }
+input { width:80%; padding:10px; }
+button { padding:10px; }
+</style>
 </head>
-<body>
 
-<h2>Boss AIX - तुमचा AI मित्र</h2>
+<body>
+<h2>Boss AIX – तुमचा Smart AI मित्र</h2>
 
 <div id="chat"></div>
 
-<input id="msg" style="width:80%; padding:10px;" placeholder="तुमचा मेसेज टाइप करा...">
-<button onclick="send()">SEND</button>
+<input id="msg" placeholder="संदेश टाईप करा...">
+<button onclick="send()">Send</button>
 
 <script>
-const chat = document.getElementById("chat");
+const BACKEND = "https://boss-aix-backend-x0lp.onrender.com";
 
 function add(text, cls){
-  const p = document.createElement("p");
-  p.className = cls;
-  p.innerText = text;
-  chat.appendChild(p);
-  chat.scrollTop = chat.scrollHeight;
+    document.getElementById("chat").innerHTML += `<div class='msg ${cls}'>${text}</div>`;
 }
 
 async function send(){
-  const text = document.getElementById("msg").value;
-  document.getElementById("msg").value = "";
-  add("You: "+text, "you");
+    let text = document.getElementById("msg").value;
+    if(!text) return;
 
-  const r = await fetch("https://aix-clean-backend.onrender.com/api/boss/command", {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ message:text })
-  });
+    add("You: " + text, "you");
+    document.getElementById("msg").value = "";
 
-  const data = await r.json();
+    const r = await fetch(BACKEND + "/api/boss/command", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({ message:text })
+    });
 
-  add("Boss AIX: "+(data.reply || "ERR"), "boss");
+    const data = await r.json();
+    add("Boss AIX: " + data.reply, "boss");
 }
 </script>
 
