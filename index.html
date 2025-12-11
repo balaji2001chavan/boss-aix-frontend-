@@ -1,54 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Boss AIX – तुमचा Smart AI मित्र</title>
+  <title>Boss AIX</title>
   <style>
-    body { font-family: Arial; background:#111; color:#fff; padding:20px; }
-    #chat { height:400px; overflow-y:auto; border:1px solid #444; padding:10px; }
-    .you { color:#0f0; margin:5px; }
-    .boss { color:#0af; margin:5px; }
+    body { font-family: sans-serif; padding: 20px; }
+    .box { width: 100%; border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
   </style>
 </head>
+
 <body>
+  <h2>Boss AIX – तुमचा Smart AI</h2>
 
-<h2>Boss AIX – तुमचा Smart AI मित्र</h2>
+  <div class="box" id="chat"></div>
 
-<div id="chat"></div>
+  <br>
 
-<input id="msg" placeholder="इथे लिहा..." style="width:70%; padding:10px;">
-<button onclick="send()" style="padding:10px;">Send</button>
+  <input id="msg" placeholder="तुमचा मेसेज..." style="width: 80%; padding: 10px;">
+  <button onclick="send()">Send</button>
 
-<script>
-const backend = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
+  <script>
+    const API = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
 
-function add(text, cls) {
-  const div = document.createElement("div");
-  div.className = cls;
-  div.textContent = text;
-  document.getElementById("chat").appendChild(div);
-}
+    function add(text, who="boss") {
+      const box = document.getElementById("chat");
+      box.innerHTML += "<div><b>" + who + ":</b> " + text + "</div>";
+      box.scrollTop = box.scrollHeight;
+    }
 
-async function send() {
-  const text = document.getElementById("msg").value;
-  document.getElementById("msg").value = "";
+    async function send() {
+      let message = document.getElementById("msg").value.trim();
+      if (!message) return;
 
-  add("You: " + text, "you");
+      add(message, "You");
+      document.getElementById("msg").value = "";
 
-  try {
-    const r = await fetch(backend, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text }),
-    });
+      try {
+        const r = await fetch(API, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
 
-    const data = await r.json();
+        const data = await r.json();
 
-    add("Boss AIX: " + data.reply, "boss");
-  } catch (err) {
-    add("Boss AIX: ❌ Backend reachable नाही", "boss");
-  }
-}
-</script>
+        if (data.reply) add(data.reply, "AIX");
+        else add("AIX Error!", "AIX");
 
+      } catch (e) {
+        add("Backend reachable नाही ⚠️", "AIX");
+      }
+    }
+  </script>
 </body>
 </html>
