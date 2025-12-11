@@ -1,96 +1,45 @@
-<!DOCTYPE html>
-<html lang="mr">
-<head>
-  <meta charset="UTF-8" />
-  <title>Boss AIX – तुमचा Smart AI Partner</title>
-  <style>
-    body {
-      background: #0d0d0d;
-      font-family: Arial;
-      color: white;
-      padding: 20px;
+import express from "express";
+import cors from "cors";
+import bodyParser from "body-parser";
+
+const app = express();
+
+// ❤️ CORS – FIX FOR RENDER FRONTEND
+app.use(cors({
+  origin: "*",            // allow all
+  methods: "GET,POST",    // what methods allowed
+  allowedHeaders: "Content-Type"
+}));
+
+app.use(bodyParser.json());
+
+// TEST ROOT
+app.get("/", (req, res) => {
+  res.json({ ok: true, msg: "Boss AIX Backend LIVE" });
+});
+
+// MAIN API used by frontend
+app.post("/api/aix", (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.json({ reply: "मला काय सांगायचे ते बोला बॉस ❤️" });
     }
 
-    .chat-box {
-      width: 100%;
-      height: 70vh;
-      border: 1px solid #444;
-      padding: 10px;
-      overflow-y: auto;
-      background: #111;
-      border-radius: 8px;
-    }
+    // TEMP dummy smart reply
+    return res.json({
+      reply: `बॉस, मी ऐकत आहे: "${message}". AIX पूर्ण स्मार्ट मोडमध्ये आहे 🔥`
+    });
 
-    .you { color: #00eaff; margin: 10px 0; }
-    .boss { color: #00ff9d; margin: 10px 0; }
-
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    button {
-      background: #00ff9d;
-      color: black;
-      cursor: pointer;
-    }
-  </style>
-</head>
-
-<body>
-
-<h2>Boss AIX – तुमचा Smart AI मित्र</h2>
-
-<div class="chat-box" id="chat"></div>
-
-<input id="msg" placeholder="इथे मेसेज टाइप करा..." />
-<button onclick="send()">SEND</button>
-
-<script>
-  const backend = "https://boss-aix-backend.onrender.com/api/aix";
-
-  function add(text, who) {
-    const box = document.getElementById("chat");
-    const div = document.createElement("div");
-    div.className = who;
-    div.innerText = text;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ reply: "AIX ERROR: Backend crash झाला" });
   }
+});
 
-  async function send() {
-    const text = document.getElementById("msg").value.trim();
-    if (!text) return;
-
-    add("You: " + text, "you");
-    document.getElementById("msg").value = "";
-
-    try {
-      const r = await fetch(backend, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: text })
-      });
-
-      const data = await r.json();
-
-      if (data.reply) {
-        add("Boss AIX: " + data.reply, "boss");
-      } else {
-        add("Boss AIX: (रिकामा प्रतिसाद)", "boss");
-      }
-
-    } catch (err) {
-      add("Boss AIX: ❌ Backend पोहोचत नाही", "boss");
-      console.error(err);
-    }
-  }
-</script>
-
-</body>
-</html>
+// PORT
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("Boss AIX Backend running on PORT", PORT);
+});
