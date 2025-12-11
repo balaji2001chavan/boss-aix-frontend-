@@ -1,45 +1,57 @@
-import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+  <meta charset="UTF-8">
+  <title>Boss AIX – तुमचा Smart मित्र</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f7f7f7; }
+    #box { width: 100%; height: 400px; overflow-y: auto; background: white; padding: 10px; }
+    .you { color: blue; margin: 5px 0; }
+    .boss { color: green; margin: 5px 0; }
+  </style>
+</head>
 
-const app = express();
+<body>
+  <h2>Boss AIX – Live Chat</h2>
 
-// ❤️ CORS – FIX FOR RENDER FRONTEND
-app.use(cors({
-  origin: "*",            // allow all
-  methods: "GET,POST",    // what methods allowed
-  allowedHeaders: "Content-Type"
-}));
+  <div id="box"></div>
 
-app.use(bodyParser.json());
+  <input id="msg" style="width: 70%; padding: 10px;" placeholder="काही बोला बॉस...">
+  <button onclick="send()" style="padding:10px">SEND</button>
 
-// TEST ROOT
-app.get("/", (req, res) => {
-  res.json({ ok: true, msg: "Boss AIX Backend LIVE" });
-});
+<script>
+const API = "https://boss-aix-backend.onrender.com/api/aix";
 
-// MAIN API used by frontend
-app.post("/api/aix", (req, res) => {
-  try {
-    const { message } = req.body;
+function add(text, who){
+   const box = document.getElementById("box");
+   const div = document.createElement("div");
+   div.className = who;
+   div.textContent = text;
+   box.appendChild(div);
+   box.scrollTop = box.scrollHeight;
+}
 
-    if (!message) {
-      return res.json({ reply: "मला काय सांगायचे ते बोला बॉस ❤️" });
-    }
+async function send(){
+  const text = document.getElementById("msg").value;
+  if(!text) return;
+  add("You: " + text, "you");
+  document.getElementById("msg").value = "";
 
-    // TEMP dummy smart reply
-    return res.json({
-      reply: `बॉस, मी ऐकत आहे: "${message}". AIX पूर्ण स्मार्ट मोडमध्ये आहे 🔥`
+  try{
+    const r = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify({ message: text })
     });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ reply: "AIX ERROR: Backend crash झाला" });
-  }
-});
+    const data = await r.json();
+    add("Boss AIX: " + data.reply, "boss");
 
-// PORT
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log("Boss AIX Backend running on PORT", PORT);
-});
+  }catch(e){
+    add("Boss AIX: ❌ Backend reachable नाही", "boss");
+  }
+}
+</script>
+
+</body>
+</html>
