@@ -1,44 +1,61 @@
 <!DOCTYPE html>
-<html>
+<html lang="mr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Boss AIX – Smart AI</title>
-  <style>
-    body { font-family: Arial; background: #111; color: #fff; margin: 0; padding: 20px; }
-    .box { background: #222; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
-    input { width: 80%; padding: 10px; border-radius: 5px; border: none; }
-    button { padding: 10px 20px; background: #0f0; border: none; border-radius: 5px; }
-    .msg { margin: 10px 0; }
-  </style>
+<meta charset="UTF-8">
+<title>Boss AIX – तुमचा Smart AI मित्र</title>
+
+<style>
+body { font-family: Arial; background:#0d0f1f; color:white; margin:30px; }
+.box { width:90%; max-width:700px; margin:auto; padding:20px; border:1px solid #444; border-radius:10px; background:#111428; }
+.msg { padding:10px; margin-top:10px; border-radius:8px; }
+.you { background:#23284a; }
+.boss { background:#1b5cf0; }
+input, button { padding:12px; width:100%; margin-top:10px; border-radius:6px; border:none; }
+</style>
+
 </head>
+
 <body>
-  <div class="box">
-    <h2>Boss AIX – तुमचा Smart AI मित्र</h2>
-    <div id="chat"></div>
-    <input id="text" placeholder="Type here..." />
-    <button onclick="send()">Send</button>
-  </div>
+<div class="box">
+  <h2>Boss AIX – LIVE</h2>
+
+  <div id="chat"></div>
+
+  <input id="text" placeholder="बोला…">
+  <button onclick="send()">SEND</button>
+</div>
 
 <script>
 async function send() {
-  const msg = document.getElementById("text").value;
-  if (!msg) return;
-  add("You: " + msg);
+  const t = document.getElementById("text").value.trim();
+  if (!t) return;
 
-  const r = await fetch("https://boss-aix-backend-x0lp.onrender.com/api/aix", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: msg }),
-  });
+  add("You: " + t, "you");
+  document.getElementById("text").value = "";
 
-  const data = await r.json();
-  add("AIX: " + (data.reply || "⚠️ error"));
+  try {
+    const r = await fetch("https://boss-aix-backend-x0lp.onrender.com/api/aix", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: t })
+    });
+
+    const data = await r.json();
+
+    add("Boss AIX: " + (data.reply || "मी विचार करत आहे…"), "boss");
+  } 
+  catch (e) {
+    add("Boss AIX: Backend reachable नाही", "boss");
+  }
 }
 
-function add(t) {
-  const chat = document.getElementById("chat");
-  chat.innerHTML += `<div class='msg'>${t}</div>`;
+function add(msg, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerText = msg;
+  document.getElementById("chat").appendChild(div);
 }
 </script>
+
 </body>
 </html>
