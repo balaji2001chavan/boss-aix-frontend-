@@ -26,34 +26,35 @@ input, button { padding:12px; width:100%; margin-top:10px; border-radius:6px; bo
 </div>
 
 <script>
-async function send() {
-  const t = document.getElementById("text").value.trim();
-  if (!t) return;
+const API = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
 
-  add("You: " + t, "you");
-  document.getElementById("text").value = "";
+async function send() {
+  const text = document.getElementById("msg").value.trim();
+  if (!text) return;
+
+  add("You: " + text, "you");
+  document.getElementById("msg").value = "";
 
   try {
-    const r = await fetch("https://boss-aix-backend-x0lp.onrender.com/api/aix", {
+    const r = await fetch(API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: t })
+      body: JSON.stringify({ message: text })
     });
 
     const data = await r.json();
-
-    add("Boss AIX: " + (data.reply || "मी विचार करत आहे…"), "boss");
-  } 
-  catch (e) {
+    add("Boss AIX: " + (data.reply || "No response"), "boss");
+  } catch (e) {
     add("Boss AIX: Backend reachable नाही", "boss");
   }
 }
 
-function add(msg, cls) {
+function add(text, who) {
+  const box = document.getElementById("chat");
   const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.innerText = msg;
-  document.getElementById("chat").appendChild(div);
+  div.className = who;
+  div.innerText = text;
+  box.appendChild(div);
 }
 </script>
 
