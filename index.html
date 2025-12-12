@@ -1,55 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Boss AIX</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    .box { width: 100%; border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
-  </style>
+<title>Boss AIX</title>
+<style>
+body { font-family: Arial; background: #000; color: #0f0; padding: 20px; }
+.chat { border: 1px solid #0f0; padding: 10px; height: 400px; overflow-y: scroll; }
+input { width: 80%; padding: 10px; }
+button { padding: 10px; background: green; color: white; }
+</style>
 </head>
 
 <body>
-  <h2>Boss AIX – तुमचा Smart AI</h2>
+<h2>Boss AIX – तुमचा Smart AI मित्र</h2>
 
-  <div class="box" id="chat"></div>
+<div class="chat" id="chat"></div>
 
-  <br>
+<input id="msg" placeholder="Type here..." />
+<button onclick="send()">Send</button>
 
-  <input id="msg" placeholder="तुमचा मेसेज..." style="width: 80%; padding: 10px;">
-  <button onclick="send()">Send</button>
+<script>
+const API = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
 
-  <script>
-    const API = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
+function add(text) {
+    document.getElementById("chat").innerHTML += "<br>" + text;
+}
 
-    function add(text, who="boss") {
-      const box = document.getElementById("chat");
-      box.innerHTML += "<div><b>" + who + ":</b> " + text + "</div>";
-      box.scrollTop = box.scrollHeight;
-    }
+async function send() {
+    let text = document.getElementById("msg").value;
+    document.getElementById("msg").value = "";
+    add("You: " + text);
 
-    async function send() {
-      let message = document.getElementById("msg").value.trim();
-      if (!message) return;
-
-      add(message, "You");
-      document.getElementById("msg").value = "";
-
-      try {
-        const r = await fetch(API, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
+    try {
+        let res = await fetch(API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text })
         });
 
-        const data = await r.json();
-
-        if (data.reply) add(data.reply, "AIX");
-        else add("AIX Error!", "AIX");
-
-      } catch (e) {
-        add("Backend reachable नाही ⚠️", "AIX");
-      }
+        let data = await res.json();
+        add("Boss AIX: " + (data.reply || data.error));
+    } catch {
+        add("Boss AIX: Backend reachable नाही ❌");
     }
-  </script>
+}
+</script>
+
 </body>
 </html>
