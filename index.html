@@ -1,56 +1,54 @@
 <!DOCTYPE html>
-<html lang="mr">
+<html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Boss AIX – तुमचा Smart AI मित्र</title>
+<meta charset="UTF-8">
+<title>Boss AIX – Smart AI</title>
 <style>
-body { font-family: Arial; background:#111; color:white; padding:20px; }
-#chat { height:400px; overflow-y:auto; border:1px solid #444; padding:10px; }
-.you { color:#6cf; margin:5px 0; }
-.boss { color:#0f0; margin:5px 0; }
-input { width:80%; padding:10px; margin-top:10px; }
-button { padding:10px 20px; font-weight:bold; }
+  body { background:#000; color:#0f0; font-family:Arial; padding:20px; }
+  #log { white-space:pre-line; padding:10px; border:1px solid #0f0; height:300px; overflow:auto; }
 </style>
 </head>
 
 <body>
 <h2>Boss AIX – तुमचा Smart AI मित्र</h2>
 
-<div id="chat"></div>
+<div id="log"></div>
 
-<input id="msg" placeholder="काहीही बोला…" />
+<input id="msg" placeholder="काही बोला..." style="width:80%; padding:10px;">
 <button onclick="send()">Send</button>
 
 <script>
 const API = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
 
-function add(text, cls) {
-  const div = document.getElementById("chat");
-  div.innerHTML += `<div class='${cls}'>${text}</div>`;
-  div.scrollTop = div.scrollHeight;
+function add(text){
+  document.getElementById("log").innerText += text + "\n";
 }
 
-async function send() {
-  const text = document.getElementById("msg").value.trim();
-  if (!text) return;
-
-  add("You: " + text, "you");
+async function send(){
+  const v = document.getElementById("msg").value;
   document.getElementById("msg").value = "";
+  add("You: " + v);
 
-  try {
+  try{
     const r = await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+      method:"POST",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ message:v })
     });
 
     const data = await r.json();
 
-    add("Boss AIX: " + (data.reply || "रिकामा उत्तर"), "boss");
-  } catch (err) {
-    add("Boss AIX: Backend reachable नाही ❌", "boss");
+    if(data.reply){
+      add(data.reply);
+    } else {
+      add("⚠ ERROR: " + JSON.stringify(data));
+    }
+
+  }catch(e){
+    add("❌ Backend reachable नाही");
   }
 }
 </script>
+
 </body>
 </html>
