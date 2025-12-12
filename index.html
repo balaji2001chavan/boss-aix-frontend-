@@ -1,49 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Boss AIX</title>
-<style>
-body { font-family: Arial; background: #000; color: #0f0; padding: 20px; }
-.chat { border: 1px solid #0f0; padding: 10px; height: 400px; overflow-y: scroll; }
-input { width: 80%; padding: 10px; }
-button { padding: 10px; background: green; color: white; }
-</style>
+  <meta charset="UTF-8" />
+  <title>Boss AIX – Smart AI</title>
+  <style>
+    body { font-family: Arial; background: #111; color: #fff; margin: 0; padding: 20px; }
+    .box { background: #222; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
+    input { width: 80%; padding: 10px; border-radius: 5px; border: none; }
+    button { padding: 10px 20px; background: #0f0; border: none; border-radius: 5px; }
+    .msg { margin: 10px 0; }
+  </style>
 </head>
-
 <body>
-<h2>Boss AIX – तुमचा Smart AI मित्र</h2>
-
-<div class="chat" id="chat"></div>
-
-<input id="msg" placeholder="Type here..." />
-<button onclick="send()">Send</button>
+  <div class="box">
+    <h2>Boss AIX – तुमचा Smart AI मित्र</h2>
+    <div id="chat"></div>
+    <input id="text" placeholder="Type here..." />
+    <button onclick="send()">Send</button>
+  </div>
 
 <script>
-const API = "https://boss-aix-backend-x0lp.onrender.com/api/aix";
+async function send() {
+  const msg = document.getElementById("text").value;
+  if (!msg) return;
+  add("You: " + msg);
 
-function add(text) {
-    document.getElementById("chat").innerHTML += "<br>" + text;
+  const r = await fetch("https://boss-aix-backend-x0lp.onrender.com/api/aix", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg }),
+  });
+
+  const data = await r.json();
+  add("AIX: " + (data.reply || "⚠️ error"));
 }
 
-async function send() {
-    let text = document.getElementById("msg").value;
-    document.getElementById("msg").value = "";
-    add("You: " + text);
-
-    try {
-        let res = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text })
-        });
-
-        let data = await res.json();
-        add("Boss AIX: " + (data.reply || data.error));
-    } catch {
-        add("Boss AIX: Backend reachable नाही ❌");
-    }
+function add(t) {
+  const chat = document.getElementById("chat");
+  chat.innerHTML += `<div class='msg'>${t}</div>`;
 }
 </script>
-
 </body>
 </html>
