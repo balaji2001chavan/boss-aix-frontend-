@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>BOSS AIX</title>
+  <title>BOSS AIX – Talk to AI</title>
   <meta charset="UTF-8" />
   <style>
     body { font-family: Arial; padding: 20px; }
     textarea { width: 100%; height: 120px; }
     button { padding: 10px 20px; margin-top: 10px; }
-    #out { margin-top: 20px; white-space: pre-wrap; }
+    #output { margin-top: 20px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
 
-<h1>BOSS AIX – Talk to AI</h1>
+  <h1>BOSS AIX – Talk to AI</h1>
 
-<textarea id="msg" placeholder="AIX ला काहीही सांगा..."></textarea>
-<br />
-<button onclick="askAIX()">Ask AIX</button>
+  <textarea id="msg" placeholder="AIX ला काहीही सांगा..."></textarea>
+  <br />
+  <button onclick="askAIX()">Ask AIX</button>
 
-<div id="out"></div>
+  <div id="output"></div>
 
 <script>
 async function askAIX() {
   const text = document.getElementById("msg").value;
-  document.getElementById("out").innerText = "Thinking...";
+  document.getElementById("output").innerText = "Thinking...";
 
   try {
     const res = await fetch(
@@ -36,11 +36,11 @@ async function askAIX() {
     );
 
     const data = await res.json();
-    document.getElementById("out").innerText =
+    document.getElementById("output").innerText =
       data.reply || "No AI reply";
   } catch (e) {
-    document.getElementById("out").innerText =
-      "❌ Frontend error";
+    document.getElementById("output").innerText =
+      "❌ Frontend error: " + e.message;
   }
 }
 </script>
