@@ -1,49 +1,77 @@
 <!DOCTYPE html>
-<html>
+<html lang="mr">
 <head>
-  <title>BOSS AIX – Talk to AI</title>
   <meta charset="UTF-8" />
+  <title>BOSS AIX – Talk to AI</title>
+
   <style>
-    body { font-family: Arial; padding: 20px; }
-    textarea { width: 100%; height: 120px; }
-    button { padding: 10px 20px; margin-top: 10px; }
-    #output { margin-top: 20px; white-space: pre-wrap; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
   </style>
 </head>
+
 <body>
 
   <h1>BOSS AIX – Talk to AI</h1>
 
   <textarea id="msg" placeholder="AIX ला काहीही सांगा..."></textarea>
   <br />
+
+  <!-- ⚠️ IMPORTANT: onclick EXACT name -->
   <button onclick="askAIX()">Ask AIX</button>
-    
+
   <div id="output"></div>
 
-<script>
-async function askAIX() {
-  const text = document.getElementById("msg").value;
-  document.getElementById("output").innerText = "Thinking...";
+  <script>
+    // ✅ Function is properly defined
+    async function askAIX() {
+      const text = document.getElementById("msg").value;
+      const output = document.getElementById("output");
 
-  try {
-    const res = await fetch(
-      fetch("https://boss-aix-backend-nai6.onrender.com/api/ask",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text })
+      if (!text) {
+        output.innerText = "❌ कृपया काहीतरी लिहा";
+        return;
       }
-    );
 
-    const data = await res.json();
-    document.getElementById("output").innerText =
-      data.reply || "No AI reply";
-  } catch (e) {
-    document.getElementById("output").innerText =
-      "❌ Frontend error: " + e.message;
-  }
-}
-</script>
+      output.innerText = "Thinking...";
+
+      try {
+        const response = await fetch(
+          "https://boss-aix-backend-nai6.onrender.com/api/ask",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ prompt: text })
+          }
+        );
+
+        const data = await response.json();
+        output.innerText = data.reply || "⚠️ No AI reply";
+
+      } catch (error) {
+        output.innerText = "❌ Frontend error: " + error.message;
+      }
+    }
+  </script>
 
 </body>
 </html>
