@@ -1,228 +1,183 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-<meta charset="UTF-8">
-<title>AIX – Global Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>AIX – Global Intelligence</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<style>
-/* ===== RESET ===== */
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html, body { width: 100%; height: 100%; overflow: hidden; font-family: "Segoe UI", sans-serif; }
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-/* ===== GALAXY BACKGROUND ===== */
-body {
-  background: black;
-  color: white;
-}
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
 
-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-}
+    body {
+      height: 100vh;
+      overflow: hidden;
+      background: black;
+      color: white;
+    }
 
-/* ===== GLASS CHAT UI ===== */
-.chat-container {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 92%;
-  max-width: 720px;
-  height: 60%;
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(18px);
-  border-radius: 22px;
-  box-shadow: 0 0 40px rgba(0,255,255,0.35);
-  display: flex;
-  flex-direction: column;
-  z-index: 10;
-}
+    /* 🌌 Galaxy background */
+    .galaxy {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, #ffffff22, transparent 40%),
+        radial-gradient(circle at 80% 70%, #00ffff22, transparent 40%),
+        radial-gradient(circle at 50% 50%, #ff00ff22, transparent 50%),
+        linear-gradient(120deg, #020024, #090979, #000000);
+      animation: moveGalaxy 20s infinite alternate;
+      z-index: -1;
+    }
 
-.chat-header {
-  padding: 15px;
-  text-align: center;
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
-}
+    @keyframes moveGalaxy {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
 
-.messages {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-}
+    /* 💬 Chat box */
+    .chat-container {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 600px;
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(15px);
+      border-radius: 18px;
+      padding: 15px;
+      box-shadow: 0 0 30px #00ffff55;
+    }
 
-.msg {
-  margin-bottom: 12px;
-  line-height: 1.6;
-}
+    .chat-log {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
 
-.user { color: #00eaff; }
-.aix  { color: #caffff; }
+    .msg {
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
 
-.input-area {
-  display: flex;
-  padding: 12px;
-  gap: 10px;
-  border-top: 1px solid rgba(255,255,255,0.15);
-}
+    .user {
+      color: #00ffff;
+    }
 
-input {
-  flex: 1;
-  background: rgba(255,255,255,0.1);
-  border: none;
-  outline: none;
-  color: white;
-  padding: 14px;
-  border-radius: 14px;
-  font-size: 16px;
-}
+    .aix {
+      color: #ffffff;
+      opacity: 0.9;
+    }
 
-button {
-  background: linear-gradient(135deg,#00faff,#00bcd4);
-  border: none;
-  border-radius: 14px;
-  padding: 0 20px;
-  font-size: 16px;
-  cursor: pointer;
-  color: black;
-}
+    .chat-input {
+      display: flex;
+      gap: 10px;
+    }
 
-button:hover {
-  filter: brightness(1.15);
-}
+    input {
+      flex: 1;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
 
-/* ===== APPROVAL BUTTON ===== */
-.approve-btn {
-  margin-top: 10px;
-  background: #00ff99;
-}
-</style>
+    button {
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: none;
+      background: #00ffff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00dddd;
+    }
+
+    footer {
+      position: fixed;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0.8;
+      font-size: 13px;
+    }
+  </style>
 </head>
 
 <body>
+  <div class="galaxy"></div>
 
-<!-- 🌌 Galaxy Canvas -->
-<canvas id="galaxy"></canvas>
+  <footer>🌍 AIX – Global Intelligence Online</footer>
 
-<!-- 💬 Chat UI -->
-<div class="chat-container">
-  <div class="chat-header">AIX · Global Intelligence OS</div>
+  <div class="chat-container">
+    <div class="chat-log" id="chatLog">
+      <div class="msg aix">नमस्कार 🙏 मी AIX आहे. तुम्ही काहीही विचारू शकता.</div>
+    </div>
 
-  <div class="messages" id="messages"></div>
-
-  <div class="input-area">
-    <input id="userInput" placeholder="AIX शी बोला… (बोलणं = आदेश)" />
-    <button onclick="send()">Send</button>
+    <div class="chat-input">
+      <input
+        id="userInput"
+        placeholder="इथे लिहा… (Marathi / Hindi / English)"
+        onkeydown="if(event.key==='Enter') sendMessage()"
+      />
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
-</div>
 
-<script>
-/* =======================
-   🌌 GALAXY ANIMATION
-======================= */
-const canvas = document.getElementById("galaxy");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+  <script>
+    const chatLog = document.getElementById("chatLog");
+    const input = document.getElementById("userInput");
 
-let stars = [];
-for (let i = 0; i < 250; i++) {
-  stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    r: Math.random() * 2,
-    dx: (Math.random() - 0.5) * 0.3,
-    dy: (Math.random() - 0.5) * 0.3
-  });
-}
-
-function animateGalaxy() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "white";
-  stars.forEach(s => {
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fill();
-    s.x += s.dx;
-    s.y += s.dy;
-    if (s.x < 0 || s.x > canvas.width) s.dx *= -1;
-    if (s.y < 0 || s.y > canvas.height) s.dy *= -1;
-  });
-  requestAnimationFrame(animateGalaxy);
-}
-animateGalaxy();
-
-/* =======================
-   💬 CHAT LOGIC
-======================= */
-const messages = document.getElementById("messages");
-
-function addMessage(text, cls) {
-  const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.innerText = text;
-  messages.appendChild(div);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-async function send() {
-  const input = userInput.value.trim();
-  if (!input) return;
-
-  addMessage("You: " + input, "user");
-  userInput.value = "";
-
-  const res = await fetch(
-    "https://boss-aix-backend-nai6.onrender.com/aix/command",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: input })
+    function addMessage(text, type) {
+      const div = document.createElement("div");
+      div.className = "msg " + type;
+      div.textContent = text;
+      chatLog.appendChild(div);
+      chatLog.scrollTop = chatLog.scrollHeight;
     }
-  );
 
-  const data = await res.json();
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
 
-  if (data.mode === "SELF_CHANGE_PROPOSAL") {
-    addMessage("AIX: 🔧 " + data.plan.summary, "aix");
+      addMessage("🧑 " + message, "user");
+      input.value = "";
 
-    const btn = document.createElement("button");
-    btn.innerText = "Approve Change";
-    btn.className = "approve-btn";
-    btn.onclick = () => approveChange(data.plan, data.change);
-    messages.appendChild(btn);
+      try {
+        const res = await fetch(
+          "https://boss-aix-backend-nai6.onrender.com/api/aix-apx",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer AIX_PRIVATE_001"
+            },
+            body: JSON.stringify({ message })
+          }
+        );
 
-  } else if (data.execution) {
-    addMessage("AIX: " + data.execution.result, "aix");
-  } else {
-    addMessage("AIX: " + (data.response || "समजून घेत आहे…"), "aix");
-  }
-}
+        const data = await res.json();
+        console.log("AIX RESPONSE:", data);
 
-/* =======================
-   ✅ APPROVAL FLOW
-======================= */
-async function approveChange(plan, change) {
-  const res = await fetch(
-    "https://boss-aix-backend-nai6.onrender.com/aix/approve-change",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan, change })
+        addMessage("🤖 " + (data.reply || "AIX ने उत्तर दिलं नाही"), "aix");
+
+      } catch (err) {
+        console.error(err);
+        addMessage("⚠️ AIX server शी संपर्क झाला नाही", "aix");
+      }
     }
-  );
-
-  const data = await res.json();
-  addMessage("AIX: ✅ GitHub Apply Plan तयार आहे\n" +
-    JSON.stringify(data.githubPlan, null, 2), "aix");
-}
-</script>
-
+  </script>
 </body>
 </html>
