@@ -1,162 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>AIX – Global Intelligence</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<title>AIX – Global Action Intelligence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont;
-      background: radial-gradient(circle at top, #0f2027, #203a43, #000);
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+<style>
+:root {
+  --bg: #0b0f1a;
+  --panel: rgba(255,255,255,0.06);
+  --accent: #4ade80;
+  --danger: #ef4444;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+}
 
-    header {
-      padding: 16px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: 600;
-      background: rgba(0,0,0,0.4);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
+* { box-sizing: border-box; }
 
-    #chat {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-    }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  background: radial-gradient(circle at top, #1f2937, #020617);
+  color: var(--text);
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+}
 
-    .msg {
-      max-width: 80%;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      border-radius: 14px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-    }
+/* ===== SIDEBAR ===== */
+aside {
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255,255,255,0.08);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
 
-    .user {
-      margin-left: auto;
-      background: #2563eb;
-    }
+aside h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
 
-    .aix {
-      margin-right: auto;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-    }
+.folder {
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: var(--panel);
+  cursor: pointer;
+  transition: 0.2s;
+}
+.folder:hover {
+  background: rgba(255,255,255,0.12);
+}
 
-    footer {
-      display: flex;
-      padding: 12px;
-      background: rgba(0,0,0,0.5);
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
+.new-folder {
+  margin-top: auto;
+  padding: 10px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+}
 
-    input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 15px;
-    }
+/* ===== MAIN ===== */
+main {
+  display: flex;
+  flex-direction: column;
+}
 
-    button {
-      margin-left: 10px;
-      padding: 12px 18px;
-      border-radius: 10px;
-      border: none;
-      background: #22c55e;
-      color: #000;
-      font-weight: 600;
-      cursor: pointer;
-    }
+/* HEADER */
+header {
+  padding: 14px 20px;
+  background: rgba(0,0,0,0.5);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-    button:disabled {
-      opacity: 0.5;
-    }
-  </style>
+header strong {
+  font-size: 18px;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* CHAT */
+#chat {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.user {
+  margin-left: auto;
+  background: #2563eb;
+}
+
+.aix {
+  margin-right: auto;
+  background: var(--panel);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* JOB PANEL */
+.job {
+  margin: 10px 0;
+  padding: 12px;
+  background: rgba(0,0,0,0.4);
+  border-left: 4px solid var(--accent);
+  font-size: 14px;
+}
+
+/* INPUT */
+footer {
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  background: rgba(0,0,0,0.6);
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+input {
+  flex: 1;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+}
+
+button {
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.send {
+  background: var(--accent);
+  color: #000;
+}
+
+.voice {
+  background: #22c55e;
+}
+
+.save {
+  background: #64748b;
+  color: #fff;
+}
+</style>
 </head>
+
 <body>
 
+<!-- SIDEBAR -->
+<aside>
+  <h2>📂 Workspaces</h2>
+  <div class="folder">General</div>
+  <div class="folder">Business</div>
+  <div class="folder">Development</div>
+  <div class="folder">Automation</div>
+
+  <div class="new-folder">+ New Topic</div>
+</aside>
+
+<!-- MAIN -->
+<main>
 <header>
-  🌐 AIX – Global Intelligence Online
+  <strong>🌐 AIX – Global Action Intelligence</strong>
+  <div class="status">
+    <div class="dot"></div>
+    <span id="statusText">Idle</span>
+  </div>
 </header>
 
 <div id="chat"></div>
 
 <footer>
-  <input
-    id="input"
-    placeholder="इथे लिहा… (Marathi / Hindi / English)"
-    autocomplete="off"
-  />
-  <button id="send">Send</button>
+  <input id="input" placeholder="Type or speak your command (Marathi / Hindi / English)" />
+  <button class="voice" id="voice">🎙️</button>
+  <button class="save" id="save">💾</button>
+  <button class="send" id="send">Send</button>
 </footer>
+</main>
 
 <script>
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
-  const sendBtn = document.getElementById("send");
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const statusText = document.getElementById("statusText");
 
-  function addMessage(text, who) {
-    const div = document.createElement("div");
-    div.className = "msg " + who;
-    div.textContent = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
+function addMessage(text, who) {
+  const div = document.createElement("div");
+  div.className = "msg " + who;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
+async function sendMessage(text) {
+  if (!text) return;
+  addMessage(text, "user");
+  input.value = "";
+  statusText.textContent = "Thinking…";
 
-    addMessage(text, "user");
-    input.value = "";
-    sendBtn.disabled = true;
-
-    try {
-      const res = await fetch(
-        "https://boss-aix-backend-nai6.onrender.com/api/aix",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: text })
-        }
-      );
-
-      const data = await res.json();
-
-      if (data.reply) {
-        addMessage(data.reply, "aix");
-      }
-
-      if (data.result) {
-        addMessage(JSON.stringify(data.result, null, 2), "aix");
-      }
-    } catch (e) {
-      addMessage("नेटवर्क अडचण आली बॉस. पुन्हा प्रयत्न करूया.", "aix");
-    } finally {
-      sendBtn.disabled = false;
-    }
-  }
-
-  sendBtn.onclick = sendMessage;
-  input.addEventListener("keydown", e => {
-    if (e.key === "Enter") sendMessage();
+  const res = await fetch("https://boss-aix-backend-nai6.onrender.com/api/aix", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
   });
 
-  // Initial greeting
-  addMessage(
-    "नमस्कार बॉस 🙂\nमी AIX आहे.\nतुम्ही काहीही विचारू शकता – माहिती, सल्ला किंवा रियल काम.",
-    "aix"
-  );
+  const data = await res.json();
+  statusText.textContent = "Idle";
+
+  if (data.reply) addMessage(data.reply, "aix");
+  if (data.job) {
+    addMessage(
+      `⏱️ JOB STARTED\nStatus: ${data.job.status}\nStep: ${data.job.currentStep}`,
+      "aix"
+    );
+  }
+}
+
+document.getElementById("send").onclick = () => sendMessage(input.value);
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage(input.value);
+});
+
+/* Voice */
+const recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (recognition) {
+  const r = new recognition();
+  r.lang = "en-IN";
+  document.getElementById("voice").onclick = () => {
+    r.start();
+    statusText.textContent = "Listening…";
+  };
+  r.onresult = e => {
+    input.value = e.results[0][0].transcript;
+    statusText.textContent = "Idle";
+  };
+}
+
+/* Save chat */
+document.getElementById("save").onclick = () => {
+  const text = chat.innerText;
+  const blob = new Blob([text], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "aix-chat.txt";
+  a.click();
+};
+
+/* Greeting */
+addMessage(
+  "नमस्कार बॉस 👋\nमी AIX आहे.\nतुम्ही बोलू शकता, टाइप करू शकता, आणि रियल काम सुरू करू शकता.",
+  "aix"
+);
 </script>
 
 </body>
