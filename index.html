@@ -2,68 +2,112 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AIX • Mission Control</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>AIX • One Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#060914;--panel:#0e1430;--card:#131a3d;--acc:#00f5a0;--txt:#e8ebf1;--mut:#9aa3b2}
-*{box-sizing:border-box} body{margin:0;font-family:Inter;background:radial-gradient(circle at top,#0b1028,#060914);color:var(--txt)}
-.app{max-width:420px;margin:auto;min-height:100vh;display:flex;flex-direction:column}
-.top{display:flex;justify-content:space-between;align-items:center;padding:12px;background:rgba(14,20,48,.9);border-bottom:1px solid #1a235a}
+:root{--bg:#070a14;--panel:#0f1530;--card:#151c3d;--acc:#00f5a0;--txt:#e9ecf5;--mut:#9aa3b2;--warn:#ffb020}
+*{box-sizing:border-box} body{margin:0;font-family:Inter;background:radial-gradient(circle at top,#0b1233,#070a14);color:var(--txt)}
+.app{display:grid;grid-template-rows:56px 1fr 140px;height:100vh}
+.top{display:flex;align-items:center;justify-content:space-between;padding:0 14px;background:rgba(15,21,48,.9);border-bottom:1px solid #1a235a}
 .badge{font-size:12px;color:var(--acc)}
-.video{flex:1;position:relative;background:#000}
-.video video{width:100%;height:100%;object-fit:cover}
+.main{display:grid;grid-template-columns:1fr 360px}
+.preview{position:relative;background:#000}
+.preview video{width:100%;height:100%;object-fit:cover}
 .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--mut)}
-.logs{max-height:120px;overflow:auto;background:var(--card);padding:10px;font-size:12px}
-.btns{display:flex;gap:10px;padding:12px;background:linear-gradient(180deg,var(--panel),#060914)}
-button{flex:1;padding:14px;border:none;border-radius:14px;font-weight:700}
+.overlay{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.6);padding:6px 10px;border-radius:20px;font-size:12px}
+.side{background:var(--panel);border-left:1px solid #1a235a;display:flex;flex-direction:column}
+.section{padding:12px;border-bottom:1px solid #1a235a}
+.section h4{margin:0 0 8px 0;font-size:13px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tool{background:var(--card);border-radius:12px;padding:10px;font-size:12px;text-align:center;cursor:pointer}
+.logs{flex:1;overflow:auto;font-size:12px;padding:12px}
+.bottom{display:flex;gap:10px;padding:12px;background:linear-gradient(180deg,var(--panel),#070a14)}
+button{flex:1;padding:14px;border:none;border-radius:14px;font-weight:800}
 .start{background:linear-gradient(135deg,#00f5a0,#4da3ff);color:#000}
 .dl{background:#1b2355;color:#fff}
+@media(max-width:900px){.main{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="top">
-    <b>AIX Mission Control</b>
+    <b>AIX • One Control</b>
     <span class="badge" id="state">● READY</span>
   </div>
 
-  <div class="video" id="v">
-    <div class="hint" id="h">Tap START</div>
+  <div class="main">
+    <div class="preview" id="pv">
+      <div class="hint" id="hint">Tap START</div>
+      <div class="overlay">LIVE</div>
+    </div>
+
+    <div class="side">
+      <div class="section">
+        <h4>App Builder</h4>
+        <div class="grid">
+          <div class="tool" onclick="startJob('video')">🎬 Video</div>
+          <div class="tool" onclick="startJob('image')">🖼 Image</div>
+          <div class="tool" onclick="alert('Soon')">🧩 Tools</div>
+          <div class="tool" onclick="openGit()">🐙 GitHub</div>
+          <div class="tool" onclick="alert('Deploy soon')">🚀 Deploy</div>
+          <div class="tool" onclick="alert('Settings soon')">⚙️ Settings</div>
+        </div>
+      </div>
+      <div class="section">
+        <h4>Live Logs</h4>
+      </div>
+      <div class="logs" id="logs">Idle…</div>
+    </div>
   </div>
 
-  <div class="logs" id="logs">Idle…</div>
-
-  <div class="btns">
-    <button class="start" onclick="start()">START</button>
+  <div class="bottom">
+    <button class="start" onclick="startJob('video')">START</button>
     <button class="dl" onclick="download()">DOWNLOAD</button>
   </div>
 </div>
 
 <script>
 const API="https://boss-aix-backend-nai6.onrender.com";
+let polling=false;
 
-async function start(){
+function openGit(){ window.open("https://github.com/balaji2001chavan/AIX-CLEAN","_blank"); }
+
+async function startJob(type){
   document.getElementById("state").innerText="● RUNNING";
-  const h=document.getElementById("h"); if(h) h.remove();
-  await fetch(API+"/api/start",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({type:"video"})});
+  const h=document.getElementById("hint"); if(h) h.innerText="⏳ Planning…";
+  await fetch(API+"/api/start",{method:"POST",headers:{'Content-Type':'application/json'},body:JSON.stringify({type})});
 }
 
 function download(){ window.open(API+"/output/demo.mp4","_blank"); }
 
-setInterval(async()=>{
+async function poll(){
+  if(polling) return; polling=true;
   try{
     const s=await fetch(API+"/api/status").then(r=>r.json());
-    if(!s.running){document.getElementById("state").innerText="● READY";return;}
+    if(!s.running){
+      document.getElementById("state").innerText="● READY";
+      setTimeout(poll,5000);
+      return;
+    }
     const l=await fetch(API+"/api/logs").then(r=>r.json());
     document.getElementById("logs").innerHTML=l.join("<br>");
+    const h=document.getElementById("hint");
+    if(h && l[l.length-1]) h.innerText="⏳ "+l[l.length-1];
+
     if(s.job?.output){
       const v=document.createElement("video");
       v.src=API+s.job.output; v.controls=true;
-      const c=document.getElementById("v"); c.innerHTML=""; c.appendChild(v);
+      const pv=document.getElementById("pv"); pv.innerHTML=""; pv.appendChild(v);
       document.getElementById("state").innerText="● DONE";
+      setTimeout(poll,5000);
+      return;
     }
-  }catch{}
-},1000);
+    setTimeout(poll,2000);
+  }catch{
+    setTimeout(poll,8000);
+  }finally{ polling=false; }
+}
+poll();
 </script>
 </body>
 </html>
