@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="mr">
 <head>
   <meta charset="UTF-8" />
   <title>AIX Studio</title>
-  <style>
-    body { font-family: sans-serif; background:#0f172a; color:white; }
-    #chat { height:300px; overflow:auto; border:1px solid #334155; padding:10px }
-    input, button { padding:10px; margin:5px }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h2>AIX Studio</h2>
+<div id="sidebar">
+  <div id="logo">AIX Studio</div>
+  <div id="projects"></div>
+</div>
 
-<div id="chat"></div>
+<div id="main">
+  <div id="chat"></div>
 
-<input id="project" placeholder="Project (optional)" />
-<br/>
-<input id="msg" placeholder="इथे लिहा…" />
-<button onclick="send()">Send</button>
+  <div id="inputBar">
+    <input id="message" placeholder="इथे लिहा… (Marathi / Hindi / English)" />
+    <button onclick="send()">Send</button>
+  </div>
 
-<p id="status"></p>
+  <div id="status">STATUS: READY</div>
+</div>
 
 <script src="app.js"></script>
 </body>
