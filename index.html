@@ -1,111 +1,129 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>AIX Studio</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-  body {
-    margin:0;
-    background:linear-gradient(135deg,#0f172a,#020617);
-    font-family:system-ui;
-    color:#e5e7eb;
-  }
-  .app {
-    max-width:900px;
-    margin:auto;
-    padding:20px;
-  }
-  h1 {
-    text-align:center;
-    color:#38bdf8;
-  }
-  .chat {
-    background:#020617;
-    border-radius:12px;
-    padding:15px;
-    min-height:300px;
-    margin-bottom:15px;
-    overflow-y:auto;
-  }
-  .msg {
-    margin:10px 0;
-    line-height:1.5;
-  }
-  .user { color:#60a5fa; }
-  .aix { color:#4ade80; }
-  .input-box {
-    display:flex;
-    gap:10px;
-  }
-  input {
-    flex:1;
-    padding:12px;
-    border-radius:10px;
-    border:none;
-    font-size:16px;
-  }
-  button {
-    padding:12px 20px;
-    border-radius:10px;
-    border:none;
-    background:#38bdf8;
-    color:#020617;
-    font-weight:bold;
-    cursor:pointer;
-  }
+body{
+  margin:0;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  font-family:system-ui;
+  color:#e5e7eb;
+}
+.app{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+.header{
+  text-align:center;
+  color:#38bdf8;
+  margin-bottom:10px;
+}
+.status{
+  text-align:center;
+  font-size:14px;
+  margin-bottom:10px;
+}
+.chat{
+  background:#020617;
+  border-radius:12px;
+  padding:15px;
+  min-height:300px;
+  overflow-y:auto;
+}
+.msg{margin:10px 0; line-height:1.5}
+.aix{color:#4ade80}
+.user{color:#60a5fa}
+.controls{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+input{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+button{
+  padding:12px 20px;
+  border-radius:10px;
+  border:none;
+  background:#38bdf8;
+  color:#020617;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
 
 <div class="app">
-  <h1>AIX – Smart Business Intelligence</h1>
+  <div class="header"><h2>AIX – Smart Intelligence Studio</h2></div>
+  <div id="status" class="status">🔄 Server तपासत आहे…</div>
 
   <div id="chat" class="chat">
     <div class="msg aix">
-      नमस्कार बॉस 👋<br/>
-      मी AIX आहे — ready-made business intelligence.<br/>
-      आज काय करू?
+      नमस्कार बॉस 👋<br>
+      मी AIX आहे. आज काय करू?
     </div>
   </div>
 
-  <div class="input-box">
-    <input id="input" placeholder="इथे लिहा… (Marathi / Hindi / English)" />
+  <div class="controls">
+    <input id="input" placeholder="इथे लिहा… (Marathi / Hindi / English)">
     <button onclick="send()">Send</button>
   </div>
 </div>
 
 <script>
-async function send(){
-  const input = document.getElementById("input");
-  const text = input.value.trim();
-  if(!text) return;
+const BACKEND = "https://boss-aix-backend-nai6.onrender.com";
 
-  add("user", text);
-  input.value = "";
-
+async function checkStatus(){
   try{
-    const res = await fetch("/api/aix", {
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body:JSON.stringify({ message:text })
-    });
-
-    const data = await res.json();
-    add("aix", data.reply);
-
+    const r = await fetch(BACKEND + "/api/status");
+    const d = await r.json();
+    document.getElementById("status").innerText =
+      "🟢 Server ONLINE";
   }catch(e){
-    add("aix","⚠️ Server शी संपर्क झाला नाही.");
+    document.getElementById("status").innerText =
+      "🔴 Server OFFLINE – backend चालू नाही";
+    add("aix",
+      "⚠️ Backend शी संपर्क होत नाही.\n" +
+      "URL किंवा deploy तपासा."
+    );
   }
 }
 
-function add(type, text){
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerHTML = text.replace(/\n/g,"<br>");
-  document.getElementById("chat").appendChild(div);
-  document.getElementById("chat").scrollTop =
-    document.getElementById("chat").scrollHeight;
+checkStatus();
+
+async function send(){
+  const text = input.value.trim();
+  if(!text) return;
+  add("user",text);
+  input.value="";
+
+  try{
+    const r = await fetch(BACKEND + "/api/aix",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:text})
+    });
+    const d = await r.json();
+    add("aix",d.reply);
+  }catch(e){
+    add("aix","❌ Server शी संपर्क झाला नाही.");
+  }
+}
+
+function add(type,text){
+  const d=document.createElement("div");
+  d.className="msg "+type;
+  d.innerText=text;
+  chat.appendChild(d);
+  chat.scrollTop=chat.scrollHeight;
 }
 </script>
 
