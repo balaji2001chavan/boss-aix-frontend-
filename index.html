@@ -2,118 +2,83 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>AIX Live System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-
+<title>AIX Live Console</title>
 <style>
-body {
-  margin:0;
-  font-family: system-ui;
-  background:#0b1020;
-  color:white;
-}
-body.galaxy {
-  background: radial-gradient(circle at top, #020024, #090979, #000);
-}
-#log {
-  height:80vh;
-  overflow:auto;
-  padding:16px;
-}
-.msg { margin-bottom:10px; }
-.user { text-align:right; }
-.aix { color:#7dd3fc; }
-#bar {
-  display:flex;
-  border-top:1px solid #333;
-}
-#bar input {
-  flex:1;
-  padding:12px;
-  background:#111;
-  border:none;
-  color:white;
-}
-#bar button {
-  padding:12px 18px;
-  background:#2563eb;
-  border:none;
-  color:white;
-}
-.card {
-  background:#111827;
-  padding:10px;
-  border-radius:8px;
-  margin-top:8px;
-}
+body{margin:0;font-family:system-ui;background:#0b0f1a;color:#e6e6e6}
+header{padding:12px;background:#111827;display:flex;gap:16px;align-items:center}
+main{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 56px)}
+.panel{padding:16px;border-right:1px solid #1f2937}
+.preview{padding:16px}
+.badge{padding:4px 8px;border-radius:8px;background:#16a34a}
+video,img{max-width:100%}
+textarea{width:100%;height:120px;background:#020617;color:#e6e6e6}
+button{padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px}
 </style>
 </head>
-
 <body>
+<header>
+  <strong>AIX • LIVE</strong>
+  <span id="time"></span>
+  <span id="loc"></span>
+  <span id="weather"></span>
+  <span class="badge">AUTO</span>
+</header>
 
-<div id="log">
-  <div class="msg aix">👋 AIX live आहे बॉस. आदेश द्या.</div>
-</div>
+<main>
+  <div class="panel">
+    <h3>Command</h3>
+    <textarea id="msg" placeholder="बोल… लिही…"></textarea>
+    <br><br>
+    <button onclick="send()">Run</button>
+    <pre id="log"></pre>
+  </div>
 
-<div id="bar">
-  <input id="inp" placeholder="उदा: screen galaxy कर / file तयार कर" />
-  <button onclick="send()">Send</button>
-</div>
+  <div class="preview">
+    <h3>Live Preview</h3>
+    <div id="out">Waiting…</div>
+  </div>
+</main>
 
 <script>
-const BACKEND_URL = "https://boss-aix-backend-nai6.onrender.com"; 
-// 👆 इथे तुमचा REAL backend URL ठेवा
+const BACKEND = "https://boss-aix-backend-nai6.onrender.com";
 
-const log = document.getElementById("log");
+// Live time
+setInterval(()=>time.innerText=new Date().toLocaleString(),1000);
 
-function add(text, who="aix") {
-  const d = document.createElement("div");
-  d.className = "msg " + who;
-  d.innerText = text;
-  log.appendChild(d);
-  log.scrollTop = 99999;
+// Location
+navigator.geolocation?.getCurrentPosition(p=>{
+  loc.innerText=`📍 ${p.coords.latitude.toFixed(2)}, ${p.coords.longitude.toFixed(2)}`;
+});
+
+// Weather (FREE KEY घाल)
+const WKEY="YOUR_OPENWEATHER_KEY";
+if(WKEY!=="YOUR_OPENWEATHER_KEY"){
+  fetch(`https://api.openweathermap.org/data/2.5/weather?q=Pune&appid=${WKEY}&units=metric`)
+  .then(r=>r.json()).then(d=>weather.innerText=`🌦️ ${d.main.temp}°C`);
 }
 
-async function send() {
-  const inp = document.getElementById("inp");
-  const text = inp.value.trim();
-  if (!text) return;
+// Send command
+async function send(){
+  const r = await fetch(BACKEND+"/api/aix",{
+    method:"POST",headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({message:msg.value})
+  });
+  const j = await r.json();
+  log.innerText = JSON.stringify(j,null,2);
+}
 
-  add(text, "user");
-  inp.value = "";
-
-  try {
-    const res = await fetch(BACKEND_URL + "/api/aix", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
-
-    const data = await res.json();
-
-    add(data.explain || data.message || "Done");
-
-    if (data.type === "UI" && data.action === "GALAXY") {
-      document.body.classList.add("galaxy");
-      add("✅ Screen galaxy mode मध्ये आहे");
+// Poll latest output
+async function poll(){
+  const r = await fetch(BACKEND+"/api/latest");
+  const j = await r.json();
+  if(j.path){
+    if(j.type==="text"){
+      out.innerHTML = `<iframe src="${BACKEND}${j.path}" style="width:100%;height:300px"></iframe>
+      <br><a href="${BACKEND}${j.path}" download>Download</a>`;
     }
-
-    if (data.type === "FILE") {
-      const c = document.createElement("div");
-      c.className = "card";
-      c.innerHTML = `⬇️ <a href="${BACKEND_URL}${data.download}" target="_blank">Download file</a>`;
-      log.appendChild(c);
-    }
-
-    if (data.type === "GITHUB") {
-      data.commands.forEach(cmd => add(cmd));
-    }
-
-  } catch (err) {
-    add("❌ Backend शी संपर्क झाला नाही");
   }
 }
+setInterval(poll,2000);
 </script>
-
 </body>
 </html>
