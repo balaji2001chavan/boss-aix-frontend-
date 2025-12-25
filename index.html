@@ -6,7 +6,7 @@
 <title>AIX</title>
 <style>
 body{margin:0;background:#020617;color:#e5e7eb;font-family:system-ui}
-.app{max-width:800px;margin:auto;padding:12px}
+.app{max-width:900px;margin:auto;padding:12px}
 .chat{background:#020617;border-radius:10px;padding:12px;height:60vh;overflow:auto}
 .msg{margin-bottom:8px;white-space:pre-wrap}
 .user{color:#60a5fa}
@@ -14,12 +14,13 @@ body{margin:0;background:#020617;color:#e5e7eb;font-family:system-ui}
 .controls{display:flex;gap:8px;margin-top:8px}
 input{flex:1;padding:10px;border-radius:8px;border:none}
 button{padding:10px;border:none;border-radius:8px;background:#38bdf8}
+.preview{margin-top:10px}
 </style>
 </head>
 
 <body>
 <div class="app">
-<h3>AIX – Smart Assistant</h3>
+<h3>AIX – Smart Intelligence</h3>
 
 <div id="chat" class="chat">
   <div class="msg aix">नमस्कार 👋<br>काय करायचं आहे?</div>
@@ -30,7 +31,7 @@ button{padding:10px;border:none;border-radius:8px;background:#38bdf8}
   <button onclick="send()">Send</button>
 </div>
 
-<div id="preview"></div>
+<div id="preview" class="preview"></div>
 </div>
 
 <script>
@@ -57,7 +58,8 @@ async function send(){
   const d=await r.json();
   add("aix",d.reply);
   if(d.preview){
-    preview.innerHTML=`<a href="${BACKEND}${d.preview}" download>⬇️ Download Output</a>`;
+    preview.innerHTML =
+      `<a href="${BACKEND}${d.preview}" download>⬇️ Download Output</a>`;
   }
 }
 </script>
