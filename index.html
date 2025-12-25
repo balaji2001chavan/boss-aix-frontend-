@@ -1,84 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8" />
-<title>AIX Live Console</title>
-<style>
-body{margin:0;font-family:system-ui;background:#0b0f1a;color:#e6e6e6}
-header{padding:12px;background:#111827;display:flex;gap:16px;align-items:center}
-main{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 56px)}
-.panel{padding:16px;border-right:1px solid #1f2937}
-.preview{padding:16px}
-.badge{padding:4px 8px;border-radius:8px;background:#16a34a}
-video,img{max-width:100%}
-textarea{width:100%;height:120px;background:#020617;color:#e6e6e6}
-button{padding:10px 14px;background:#2563eb;color:#fff;border:none;border-radius:8px}
-</style>
+  <meta charset="UTF-8">
+  <title>AIX – Global Intelligence</title>
+  <style>
+    body {
+      background: radial-gradient(circle at top, #0f2027, #000);
+      color: #fff;
+      font-family: Arial;
+      margin: 0;
+    }
+    header {
+      padding: 15px;
+      text-align: center;
+      font-size: 22px;
+      background: #111;
+    }
+    #chat {
+      padding: 15px;
+      height: 60vh;
+      overflow-y: auto;
+    }
+    #input {
+      display: flex;
+      padding: 10px;
+      background: #111;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      margin-left: 10px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      background: #00c6ff;
+      color: #000;
+      font-weight: bold;
+    }
+    .msg {
+      margin-bottom: 10px;
+    }
+    .aix {
+      color: #00eaff;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <strong>AIX • LIVE</strong>
-  <span id="time"></span>
-  <span id="loc"></span>
-  <span id="weather"></span>
-  <span class="badge">AUTO</span>
-</header>
 
-<main>
-  <div class="panel">
-    <h3>Command</h3>
-    <textarea id="msg" placeholder="बोल… लिही…"></textarea>
-    <br><br>
-    <button onclick="send()">Run</button>
-    <pre id="log"></pre>
-  </div>
+<header>🤖 AIX – Global Intelligence Online</header>
 
-  <div class="preview">
-    <h3>Live Preview</h3>
-    <div id="out">Waiting…</div>
-  </div>
-</main>
+<div id="chat"></div>
+
+<div id="input">
+  <input id="text" placeholder="बोला बॉस… (Marathi / Hindi / English)">
+  <button onclick="send()">Send</button>
+</div>
 
 <script>
 const BACKEND = "https://boss-aix-backend-nai6.onrender.com";
 
-// Live time
-setInterval(()=>time.innerText=new Date().toLocaleString(),1000);
-
-// Location
-navigator.geolocation?.getCurrentPosition(p=>{
-  loc.innerText=`📍 ${p.coords.latitude.toFixed(2)}, ${p.coords.longitude.toFixed(2)}`;
-});
-
-// Weather (FREE KEY घाल)
-const WKEY="YOUR_OPENWEATHER_KEY";
-if(WKEY!=="YOUR_OPENWEATHER_KEY"){
-  fetch(`https://api.openweathermap.org/data/2.5/weather?q=Pune&appid=${WKEY}&units=metric`)
-  .then(r=>r.json()).then(d=>weather.innerText=`🌦️ ${d.main.temp}°C`);
+function add(msg, cls="") {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.innerText = msg;
+  document.getElementById("chat").appendChild(div);
 }
 
-// Send command
-async function send(){
-  const r = await fetch(BACKEND+"/api/aix",{
-    method:"POST",headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({message:msg.value})
+async function send() {
+  const text = document.getElementById("text").value;
+  add("🧑‍💼 " + text);
+  document.getElementById("text").value = "";
+
+  const res = await fetch(BACKEND + "/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
   });
-  const j = await r.json();
-  log.innerText = JSON.stringify(j,null,2);
-}
 
-// Poll latest output
-async function poll(){
-  const r = await fetch(BACKEND+"/api/latest");
-  const j = await r.json();
-  if(j.path){
-    if(j.type==="text"){
-      out.innerHTML = `<iframe src="${BACKEND}${j.path}" style="width:100%;height:300px"></iframe>
-      <br><a href="${BACKEND}${j.path}" download>Download</a>`;
-    }
-  }
+  const data = await res.json();
+  add("🤖 " + data.reply, "aix");
 }
-setInterval(poll,2000);
 </script>
+
 </body>
 </html>
