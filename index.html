@@ -1,67 +1,106 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AIX</title>
-<style>
-body{margin:0;background:#020617;color:#e5e7eb;font-family:system-ui}
-.app{max-width:900px;margin:auto;padding:12px}
-.chat{background:#020617;border-radius:10px;padding:12px;height:60vh;overflow:auto}
-.msg{margin-bottom:8px;white-space:pre-wrap}
-.user{color:#60a5fa}
-.aix{color:#4ade80}
-.controls{display:flex;gap:8px;margin-top:8px}
-input{flex:1;padding:10px;border-radius:8px;border:none}
-button{padding:10px;border:none;border-radius:8px;background:#38bdf8}
-.preview{margin-top:10px}
-</style>
-</head>
+import express from "express";
+import cors from "cors";
+import fs from "fs";
+import path from "path";
+import OpenAI from "openai";
 
-<body>
-<div class="app">
-<h3>AIX – Smart Intelligence</h3>
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-<div id="chat" class="chat">
-  <div class="msg aix">नमस्कार 👋<br>काय करायचं आहे?</div>
-</div>
+const PORT = process.env.PORT || 10000;
+const ROOT = process.cwd();
+const OUTPUT_DIR = path.join(ROOT, "aix-output");
+if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR);
 
-<div class="controls">
-  <input id="input" placeholder="इथे लिहा…">
-  <button onclick="send()">Send</button>
-</div>
+app.use("/aix-output", express.static(OUTPUT_DIR));
 
-<div id="preview" class="preview"></div>
-</div>
+/* ============ BRAIN ============ */
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-<script>
-const BACKEND="https://boss-aix-backend-nai6.onrender.com";
-
-function add(role,text){
-  const d=document.createElement("div");
-  d.className="msg "+role;
-  d.innerText=text;
-  chat.appendChild(d);
-  chat.scrollTop=chat.scrollHeight;
+const SYSTEM_PROMPT = `
+You are AIX.
+You speak like ChatGPT: clear, calm, intelligent.
+You understand Marathi, Hindi, English.
+First explain.
+If real work is needed, respond ONLY in JSON like:
+{
+  "action": "create_demo_file",
+  "content": "text"
 }
+`;
 
-async function send(){
-  const t=input.value.trim();
-  if(!t) return;
-  add("user",t);
-  input.value="";
-  const r=await fetch(BACKEND+"/api/aix",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({message:t})
-  });
-  const d=await r.json();
-  add("aix",d.reply);
-  if(d.preview){
-    preview.innerHTML =
-      `<a href="${BACKEND}${d.preview}" download>⬇️ Download Output</a>`;
+/* ============ MEMORY ============ */
+const session = {
+  messages: []
+};
+
+/* ============ JOB STORE ============ */
+const JOBS = {};
+
+/* ============ EXECUTOR ============ */
+function execute(plan) {
+  if (plan.action === "create_demo_file") {
+    const file = `demo-${Date.now()}.txt`;
+    const filePath = path.join(OUTPUT_DIR, file);
+    fs.writeFileSync(filePath, plan.content || "AIX demo output");
+    return {
+      type: "file",
+      url: `/aix-output/${file}`
+    };
   }
+  return null;
 }
-</script>
-</body>
-</html>
+
+/* ============ API ============ */
+app.post("/api/aix", async (req, res) => {
+  const { message } = req.body;
+
+  session.messages.push({ role: "user", content: message });
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...session.messages
+    ],
+    temperature: 0.6
+  });
+
+  const reply = completion.choices[0].message.content;
+  session.messages.push({ role: "assistant", content: reply });
+
+  let output = null;
+
+  try {
+    const plan = JSON.parse(reply);
+    const jobId = "job_" + Date.now();
+    JOBS[jobId] = { status: "RUNNING" };
+
+    const result = execute(plan);
+    JOBS[jobId] = { status: "DONE", result };
+
+    output = { jobId, ...result };
+  } catch (e) {
+    // normal chat
+  }
+
+  res.json({
+    reply,
+    output
+  });
+});
+
+app.get("/api/jobs", (_, res) => {
+  res.json(JOBS);
+});
+
+app.get("/", (_, res) => {
+  res.send("AIX LIVE STUDIO BACKEND RUNNING");
+});
+
+app.listen(PORT, () => {
+  console.log("AIX backend live on", PORT);
+});
