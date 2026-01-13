@@ -69,24 +69,15 @@
     chat.scrollTop = chat.scrollHeight;
   }
 
-  async function send() {
-    const input = document.getElementById("input");
-    const text = input.value.trim();
-    if (!text) return;
-
-    add("user", text);
-    input.value = "";
-
-    try {
-      const res = await fetch("http://127.0.0.1:8080/api/aix/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-      });
-
-      const data = await res.json();
-      add("aix", data.reply);
-    } catch (e) {
+ async function sendMessage(msg) {
+  const res = await fetch("https://allinonestopdeals.com/api/aix/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: msg })
+  });
+  const data = await res.json();
+  return data.reply;
+} catch (e) {
       add("aix", "Connection error");
     }
   }
