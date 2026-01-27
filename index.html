@@ -2,246 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>AIX – Global Agentic AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>AIX – Agentic AI</title>
   <style>
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: "Segoe UI", system-ui, -apple-system;
-      background: #0f172a;
-      color: #e5e7eb;
-      display: flex;
-      height: 100vh;
-    }
-
-    /* SIDEBAR */
-    .sidebar {
-      width: 260px;
-      background: #020617;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      border-right: 1px solid #1e293b;
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 700;
-      color: #38bdf8;
-    }
-
-    .tagline {
-      font-size: 13px;
-      color: #94a3b8;
-    }
-
-    .side-btn {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      color: #e5e7eb;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-align: left;
-    }
-
-    .side-btn:hover {
-      background: #1e293b;
-    }
-
-    /* MAIN CHAT */
-    .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .header {
-      padding: 14px 20px;
-      border-bottom: 1px solid #1e293b;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #020617;
-    }
-
-    .status {
-      font-size: 13px;
-      color: #22c55e;
-    }
-
-    .chat {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-    }
-
-    .msg {
-      max-width: 75%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      margin-bottom: 12px;
-      line-height: 1.4;
-      white-space: pre-wrap;
-    }
-
-    .user {
-      background: #2563eb;
-      margin-left: auto;
-    }
-
-    .aix {
-      background: #1e293b;
-      border: 1px solid #334155;
-    }
-
-    .input-area {
-      padding: 16px;
-      border-top: 1px solid #1e293b;
-      display: flex;
-      gap: 10px;
-      background: #020617;
-    }
-
-    input {
-      flex: 1;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 15px;
-    }
-
-    button.send {
-      padding: 12px 20px;
-      background: #38bdf8;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #020617;
-    }
-
-    button.send:hover {
-      background: #0ea5e9;
-    }
-
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-    }
+    body { font-family: Arial; background:#0f172a; color:#fff; }
+    #chat { max-width:600px; margin:40px auto; }
+    textarea { width:100%; height:60px; }
+    button { padding:10px 20px; margin-top:10px; }
+    .msg { margin:10px 0; }
+    .user { color:#38bdf8; }
+    .aix { color:#22c55e; }
   </style>
 </head>
-
 <body>
-
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="logo">AIX</div>
-    <div class="tagline">
-      Global Agentic AI<br/>
-      Advisor • Engineer • Helper
-    </div>
-
-    <button class="side-btn" onclick="clearChat()">🧹 Clear Chat</button>
-    <button class="side-btn" onclick="intro()">🤖 What is AIX?</button>
-    <button class="side-btn" onclick="autonomous()">⚡ Autonomous Mode</button>
-    <button class="side-btn" onclick="health()">🩺 System Status</button>
-
-    <div style="margin-top:auto;font-size:12px;color:#64748b">
-      © AIX Global AI
-    </div>
-  </div>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="header">
-      <div>Chat with <strong>AIX</strong></div>
-      <div class="status">● LIVE</div>
-    </div>
-
-    <div class="chat" id="chat"></div>
-
-    <div class="input-area">
-      <input id="input" placeholder="Ask AIX anything…" onkeydown="if(event.key==='Enter') send()" />
-      <button class="send" onclick="send()">Send</button>
-    </div>
+  <div id="chat">
+    <h2>AIX – Agentic AI</h2>
+    <div id="messages"></div>
+    <textarea id="input" placeholder="Talk to AIX..."></textarea>
+    <button onclick="send()">Send</button>
   </div>
 
 <script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-
-/* Add message */
-function add(text, who) {
-  const div = document.createElement("div");
-  div.className = `msg ${who}`;
-  div.textContent = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-/* Send message */
-async function send(messageOverride) {
-  const text = messageOverride || input.value.trim();
-  if (!text) return;
-
-  add(text, "user");
+async function send(){
+  const msg = input.value;
   input.value = "";
 
-  try {
-    const res = await fetch("http://13.61.225.145:8080/api/aix/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
+  messages.innerHTML += `<div class="msg user">You: ${msg}</div>`;
 
-    const data = await res.json();
-    add(data.reply || "AIX is thinking…", "aix");
+  const res = await fetch("/api/aix/chat",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ message: msg })
+  });
 
-  } catch (e) {
-    add("⚠️ Connection error. AIX backend unreachable.", "aix");
-  }
+  const data = await res.json();
+  messages.innerHTML += `<div class="msg aix">AIX: ${data.reply}</div>`;
 }
-
-/* Sidebar actions */
-function clearChat() {
-  chat.innerHTML = "";
-}
-
-function intro() {
-  send("AIX, introduce yourself to a new user.");
-}
-
-function autonomous() {
-  send("AIX, enable autonomous agentic mode and explain how you work.");
-}
-
-async function health() {
-  try {
-    const r = await fetch("/api/health");
-    const d = await r.json();
-    add("System Status:\n" + JSON.stringify(d, null, 2), "aix");
-  } catch {
-    add("System health check failed.", "aix");
-  }
-}
-
-/* Welcome */
-add(
-`👋 Hello, I am AIX.
-
-I can:
-• Think like an advisor
-• Build like an engineer
-• Help like a human
-
-Ask me anything — business, tech, life, automation.`,
-"aix");
 </script>
-
 </body>
 </html>
