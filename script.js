@@ -1,35 +1,32 @@
+const API = "https://allinonestopdeals.com/api/aix/chat";
 const chat = document.getElementById("chat");
-const input = document.getElementById("message");
 
-// ⚠️ इथे तुझा AWS backend API येईल
-const API_URL = "https://allinonestopdeals.com/api/aix/chat";
-
-function add(role, text) {
+function add(text, cls) {
   const div = document.createElement("div");
-  div.className = `msg ${role}`;
-  div.innerText = `${role.toUpperCase()}: ${text}`;
+  div.className = "msg " + cls;
+  div.innerText = text;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
 async function send() {
+  const input = document.getElementById("msg");
   const text = input.value.trim();
   if (!text) return;
 
-  add("user", text);
+  add("You: " + text, "user");
   input.value = "";
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
-    });
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text })
+  });
 
-    const data = await res.json();
-    add("aix", data.reply || "No response");
+  const data = await res.json();
 
-  } catch (e) {
-    add("aix", "Connection error");
-  }
+  add(
+    `AIX:\nIntent: ${data.intent}\nPlan: ${data.plan.join(" → ")}\n\n${data.result}`,
+    "aix"
+  );
 }
