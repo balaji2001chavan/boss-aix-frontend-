@@ -1,32 +1,27 @@
-const API = "https://allinonestopdeals.com/api/aix/chat";
-const chat = document.getElementById("chat");
+// ===== AIX API CONFIG FINAL =====
+const API_BASE = "http://allinonestopdeals.com";
 
-function add(text, cls) {
-  const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+// health check
+async function checkHealth() {
+  try {
+    const r = await fetch(`${API_BASE}/api/health`);
+    const j = await r.json();
+    console.log("AIX health:", j);
+  } catch (e) {
+    console.error("Health fail", e);
+  }
 }
 
-async function send() {
-  const input = document.getElementById("msg");
-  const text = input.value.trim();
-  if (!text) return;
-
-  add("You: " + text, "user");
-  input.value = "";
-
-  const res = await fetch(API, {
+// chat send
+async function sendMessage(msg) {
+  const res = await fetch(`${API_BASE}/api/aix/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: msg })
   });
 
   const data = await res.json();
-
-  add(
-    `AIX:\nIntent: ${data.intent}\nPlan: ${data.plan.join(" → ")}\n\n${data.result}`,
-    "aix"
-  );
+  return data.reply;
 }
