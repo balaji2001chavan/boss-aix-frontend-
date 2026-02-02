@@ -1,64 +1,40 @@
-import express from "express";
+const API_BASE = "https://allinonestopdeals.com";
 
-const router = express.Router();
+const chatBox = document.getElementById("chat");
+const input = document.getElementById("message");
 
-/**
- * GET /api/aix/chat
- * (frontend testing / browser open support)
- */
-router.get("/chat", (req, res) => {
-  return res.json({
-    success: true,
-    app: "AIX",
-    mode: "AGENTIC",
-    message: "AIX chat endpoint is alive. Use POST to chat.",
-    serverTime: new Date().toISOString()
-  });
-});
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerText = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
 
-/**
- * POST /api/aix/chat
- * body: { message: string }
- */
-router.post("/chat", async (req, res) => {
+async function sendMessage() {
+  const message = input.value.trim();
+  if (!message) return;
+
+  addMessage("You: " + message, "user");
+  input.value = "";
+
   try {
-    const { message } = req.body;
+    const res = await fetch(`${API_BASE}/api/aix/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
 
-    if (!message) {
-      return res.status(400).json({
-        success: false,
-        error: "Message is required"
-      });
+    if (!res.ok) {
+      throw new Error("Server not reachable");
     }
 
-    const reply = `
-👋 Hello, I am AIX.
-
-You said: "${message}"
-
-System status:
-✅ AWS: Connected
-✅ NGINX: OK
-✅ Backend: Running
-✅ API: Stable
-
-Tell me what you want to build, fix, or automate.
-`.trim();
-
-    return res.json({
-      success: true,
-      app: "AIX",
-      reply,
-      timestamp: new Date().toISOString()
-    });
+    const data = await res.json();
+    addMessage("AIX: " + (data.reply || "No reply"), "aix");
 
   } catch (err) {
-    console.error("AIX CHAT ERROR:", err);
-    return res.status(500).json({
-      success: false,
-      error: "AIX internal error"
-    });
+    addMessage("AIX: Connection error ❌", "aix");
   }
-});
-
-export default router;
+}
