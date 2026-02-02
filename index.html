@@ -1,27 +1,111 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AIX</title>
+  <meta charset="UTF-8" />
+  <title>AIX – Agentic Intelligence</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .status {
+      text-align: center;
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 15px;
+    }
+
+    .chat {
+      height: 260px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .msg {
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .user {
+      text-align: right;
+      color: #9fd3ff;
+    }
+
+    .aix {
+      text-align: left;
+      color: #a8ff9f;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #00c6ff;
+      background: linear-gradient(to right, #0072ff, #00c6ff);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>AIX Chat</h1>
-  <input id="msg" placeholder="Say something" />
-  <button onclick="send()">Send</button>
-  <pre id="out"></pre>
 
-<script>
-const API = "https://allinonestopdeals.com";
+<div class="app">
+  <h1>AIX</h1>
+  <div class="status">Agentic Intelligence • Online</div>
 
-async function send() {
-  const text = document.getElementById("msg").value;
-  const res = await fetch(API + "/api/aix/chat", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
-  const data = await res.json();
-  document.getElementById("out").textContent = data.reply;
-}
-</script>
+  <div id="chat" class="chat"></div>
+
+  <input id="message" placeholder="Talk to AIX…" />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script src="api-aix-chat.js"></script>
 </body>
 </html>
