@@ -1,122 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>AIX – Master Agent AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>AIX – Agentic AI</title>
   <style>
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    header {
-      padding: 14px;
-      background: #020617;
-      font-weight: bold;
-      text-align: center;
-      border-bottom: 1px solid #1e293b;
-    }
-    #chat {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-    }
-    .msg {
-      margin-bottom: 12px;
-      max-width: 80%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      white-space: pre-wrap;
-    }
-    .user {
-      background: #2563eb;
-      margin-left: auto;
-    }
-    .aix {
-      background: #020617;
-      border: 1px solid #1e293b;
-    }
-    footer {
-      display: flex;
-      padding: 10px;
-      gap: 8px;
-      background: #020617;
-    }
-    input {
-      flex: 1;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-    }
-    button {
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      background: #22c55e;
-      font-weight: bold;
-    }
+    body { margin:0; background:#0b1020; color:#fff; font-family:sans-serif }
+    header { padding:16px; background:#1f3cff }
+    #chat { height:75vh; overflow:auto; padding:16px }
+    input { width:80%; padding:10px }
+    button { padding:10px }
+    .you { color:#00eaff }
+    .aix { color:#9cff57; white-space:pre-wrap }
   </style>
 </head>
 <body>
 
-<header>AIX – Autonomous Agent AI</header>
-
+<header>🤖 AIX – Master Agentic AI</header>
 <div id="chat"></div>
 
-<footer>
-  <input id="input" placeholder="Talk to AIX…" />
-  <button onclick="send()">Send</button>
-</footer>
+<input id="msg" placeholder="Talk to AIX…" />
+<button onclick="send()">Send</button>
 
 <script>
-  // ✅ PLAIN HTML → DIRECT URL
-  const API = "https://allinonestopdeals.com";
+const API = "https://allinonestopdeals.com";
 
-  const chat = document.getElementById("chat");
-  const input = document.getElementById("input");
+function add(cls, text){
+  const d=document.createElement("div");
+  d.className=cls;
+  d.textContent=text;
+  chat.appendChild(d);
+}
 
-  function add(text, cls) {
-    const div = document.createElement("div");
-    div.className = "msg " + cls;
-    div.innerText = text;
-    chat.appendChild(div);
-    chat.scrollTop = chat.scrollHeight;
-  }
-
-  async function send() {
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = "";
-
-    add(text, "user");
-
-    try {
-      const res = await fetch(API + "/api/aix/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-      });
-
-      const data = await res.json();
-      add(data.reply || "No reply from AIX", "aix");
-
-    } catch (e) {
-      add("❌ Backend reachable नाही.\nAWS / Domain / CORS तपासा.", "aix");
-    }
-  }
-
-  add(
-    "Hello. I am AIX.\nI analyze, engineer, and execute.\nTell me what to build, fix, or grow.",
-    "aix"
-  );
+async function send(){
+  const m=msg.value;
+  add("you","You: "+m);
+  msg.value="";
+  const r=await fetch(API+"/api/aix/chat",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json"},
+    body:JSON.stringify({message:m})
+  });
+  const j=await r.json();
+  add("aix","AIX: "+j.reply);
+}
 </script>
 
 </body>
