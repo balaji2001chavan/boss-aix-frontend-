@@ -1,0 +1,8 @@
+{
+  "name": "aix-frontend",
+  "version": "1.0.0",
+  "description": "AIX Frontend – Static UI",
+  "scripts": {
+    "start": "echo 'Static frontend served by nginx'"
+  }
+}
