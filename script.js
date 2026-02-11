@@ -1,41 +1,34 @@
-const chatBox = document.getElementById("chat");
-const input = document.getElementById("message");
+async function sendMessage() {
+    const input = document.getElementById("message");
+    const responseBox = document.getElementById("response");
 
-// Backend base (nginx proxy वापरतोय)
-const API = "/api/aix/chat";
-
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = `msg ${type}`;
-  div.innerText = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-async function send() {
-  const text = input.value.trim();
-  if (!text) return;
-
-  addMessage("You: " + text, "user");
-  input.value = "";
-
-  try {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: text })
-    });
-
-    const data = await res.json();
-
-    if (data.reply) {
-      addMessage("AIX: " + data.reply, "aix");
-    } else {
-      addMessage("AIX: No response", "aix");
+    const text = input.value.trim();
+    if (!text) {
+        responseBox.innerText = "❌ Please type something";
+        return;
     }
-  } catch (err) {
-    addMessage("AIX: Server error", "aix");
-  }
+
+    responseBox.innerText = "⏳ Thinking...";
+
+    try {
+        const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: text })
+        });
+
+        const data = await res.json();
+
+        if (data.reply) {
+            responseBox.innerText = "🤖 " + data.reply;
+        } else {
+            responseBox.innerText = "⚠️ No reply from AI";
+        }
+
+    } catch (err) {
+        responseBox.innerText = "❌ Server error";
+        console.error(err);
+    }
 }
