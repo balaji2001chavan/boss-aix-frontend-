@@ -1,40 +1,31 @@
-const API_BASE = "https://allinonestopdeals.com";
-
-const chatBox = document.getElementById("chat");
-const input = document.getElementById("message");
-
-function addMessage(text, type) {
-  const div = document.createElement("div");
-  div.className = "msg " + type;
-  div.innerText = text;
-  chatBox.appendChild(div);
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-async function sendMessage() {
-  const message = input.value.trim();
-  if (!message) return;
-
-  addMessage("You: " + message, "user");
-  input.value = "";
-
+async function callAIX(message) {
   try {
-    const res = await fetch(`${API_BASE}/api/aix/chat`, {
+    const res = await fetch("/api/aix/chat", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message })
     });
 
     if (!res.ok) {
-      throw new Error("Server not reachable");
+      const text = await res.text();
+      throw new Error(`Server error ${res.status}: ${text}`);
     }
 
     const data = await res.json();
-    addMessage("AIX: " + (data.reply || "No reply"), "aix");
+
+    if (!data || !data.reply) {
+      throw new Error("AIX कडून उत्तर मिळालं नाही (empty reply)");
+    }
+
+    return {
+      ok: true,
+      reply: data.reply
+    };
 
   } catch (err) {
-    addMessage("AIX: Connection error ❌", "aix");
+    return {
+      ok: false,
+      error: err.message
+    };
   }
 }
