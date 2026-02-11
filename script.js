@@ -1,27 +1,41 @@
-// ===== AIX API CONFIG FINAL =====
-const API_BASE = "http://allinonestopdeals.com";
+const chatBox = document.getElementById("chat");
+const input = document.getElementById("message");
 
-// health check
-async function checkHealth() {
-  try {
-    const r = await fetch(`${API_BASE}/api/health`);
-    const j = await r.json();
-    console.log("AIX health:", j);
-  } catch (e) {
-    console.error("Health fail", e);
-  }
+// Backend base (nginx proxy वापरतोय)
+const API = "/api/aix/chat";
+
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = `msg ${type}`;
+  div.innerText = text;
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-// chat send
-async function sendMessage(msg) {
-  const res = await fetch(`${API_BASE}/api/aix/chat`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message: msg })
-  });
+async function send() {
+  const text = input.value.trim();
+  if (!text) return;
 
-  const data = await res.json();
-  return data.reply;
+  addMessage("You: " + text, "user");
+  input.value = "";
+
+  try {
+    const res = await fetch(API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: text })
+    });
+
+    const data = await res.json();
+
+    if (data.reply) {
+      addMessage("AIX: " + data.reply, "aix");
+    } else {
+      addMessage("AIX: No response", "aix");
+    }
+  } catch (err) {
+    addMessage("AIX: Server error", "aix");
+  }
 }
