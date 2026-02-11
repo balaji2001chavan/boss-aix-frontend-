@@ -1,54 +1,15 @@
-const chat = document.getElementById("chat");
-const input = document.getElementById("input");
-const statusBar = document.getElementById("status");
-
-function addMessage(text, type = "aix") {
-  const div = document.createElement("div");
-  div.className = `msg ${type}`;
-  div.innerText = text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
 async function sendMessage() {
-  const text = input.value.trim();
-  if (!text) return;
+  const input = document.getElementById("userInput");
+  const message = input.value;
 
-  addMessage("🧑‍💻 " + text, "user");
-  input.value = "";
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message })
+  });
 
-  addMessage("🤖 AIX विचार करत आहे…", "system");
-  statusBar.innerText = "🧠 AIX processing…";
+  const data = await res.json();
 
-  const result = await callAIX(text);
-
-  // remove "thinking"
-  chat.removeChild(chat.lastChild);
-
-  if (result.ok) {
-    addMessage("🤖 " + result.reply, "aix");
-    statusBar.innerText = "✅ AIX ready";
-  } else {
-    addMessage(
-      "❌ AIX ला अडचण आली.\n\nकारण:\n" + result.error,
-      "error"
-    );
-    statusBar.innerText = "⚠️ AIX error – backend / AI check करा";
-  }
+  document.getElementById("response").innerText =
+    data.reply || "AIX silent mode 😴";
 }
-
-// ENTER key support
-input.addEventListener("keydown", e => {
-  if (e.key === "Enter") sendMessage();
-});
-
-// health check
-(async function healthCheck() {
-  try {
-    const res = await fetch("/api/health");
-    const data = await res.json();
-    statusBar.innerText = `🟢 ${data.service} : ${data.status}`;
-  } catch {
-    statusBar.innerText = "🔴 Backend offline / nginx error";
-  }
-})();
