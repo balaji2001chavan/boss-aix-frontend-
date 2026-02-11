@@ -16,18 +16,21 @@ async function sendMessage() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                message: text
-            })
+            body: JSON.stringify({ message: text })
         });
 
         const data = await res.json();
 
-        if (data.reply) {
-            responseBox.innerText = "🤖 " + data.reply;
-        } else {
-            responseBox.innerText = "⚠️ AI कडून उत्तर नाही";
-        }
+        console.log("API RESPONSE 👉", data); // 🔥 MOST IMPORTANT
+
+        const reply =
+            data.reply ||
+            data.message ||
+            data.output ||
+            data.response ||
+            JSON.stringify(data);
+
+        responseBox.innerText = "🤖 " + reply;
 
     } catch (error) {
         console.error(error);
