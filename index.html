@@ -1,38 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>AIX AI</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 30px;
-        }
-        h1 {
-            font-size: 36px;
-        }
-        input {
-            padding: 8px;
-            width: 250px;
-        }
-        button {
-            padding: 8px 16px;
-        }
-        #response {
-            margin-top: 20px;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>AIX AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      padding: 15px;
+      background: #020617;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+    }
+    #chat {
+      padding: 15px;
+      height: 65vh;
+      overflow-y: auto;
+      background: #020617;
+    }
+    .msg {
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .user {
+      color: #38bdf8;
+    }
+    .aix {
+      color: #22c55e;
+    }
+    .error {
+      color: #f87171;
+    }
+    .system {
+      color: #facc15;
+      font-size: 13px;
+    }
+    footer {
+      display: flex;
+      padding: 10px;
+      background: #020617;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      background: #020617;
+      color: #fff;
+      border: 1px solid #334155;
+      outline: none;
+    }
+    button {
+      padding: 10px 16px;
+      background: #22c55e;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    #status {
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #020617;
+      border-top: 1px solid #334155;
+    }
+  </style>
 </head>
 <body>
 
-    <h1>AIX AI</h1>
+<header>🤖 AIX AI – Smart Agent</header>
 
-    <input id="message" type="text" placeholder="Type message..." />
-    <button onclick="sendMessage()">Send</button>
+<div id="chat"></div>
 
-    <div id="response"></div>
+<footer>
+  <input id="input" placeholder="AIX शी बोला…" />
+  <button onclick="sendMessage()">Send</button>
+</footer>
 
-    <script src="script.js"></script>
+<div id="status">🔌 Connecting to AIX…</div>
+
+<script src="aix-chat.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
