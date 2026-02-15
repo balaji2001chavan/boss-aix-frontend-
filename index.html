@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <title>AIX AI</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    #reply { margin-top: 15px; white-space: pre-wrap; }
+    .error { color: red; }
+  </style>
 </head>
 <body>
 
 <h1>AIX AI 🤖</h1>
 
-<input id="msg" placeholder="AIX ला काही विचारा..." />
+<input id="msg" placeholder="AIX ला काय सांगायचं?" />
 <button onclick="send()">Send</button>
 
-<p id="reply"></p>
-<button onclick="speak()">🔊 AIX बोलेल</button>
+<div id="reply"></div>
 
 <script src="script.js"></script>
 </body>
