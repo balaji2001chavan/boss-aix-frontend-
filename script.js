@@ -1,25 +1,24 @@
 async function send() {
-  const message = document.getElementById("msg").value;
-  document.getElementById("reply").innerText = "⏳ विचार करत आहे...";
+  const msg = document.getElementById("msg").value;
+  const replyBox = document.getElementById("reply");
+
+  replyBox.innerText = "⏳ AIX विचार करतोय...";
 
   try {
     const res = await fetch("/api/aix/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
+      body: JSON.stringify({ message: msg })
     });
 
     const data = await res.json();
-    document.getElementById("reply").innerText = data.reply || "उत्तर मिळाले नाही 😔";
-  } catch (err) {
-    document.getElementById("reply").innerText = "Server error 😵";
-  }
-}
 
-/* ===== Marathi Voice ===== */
-function speak() {
-  const text = document.getElementById("reply").innerText;
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "mr-IN";
-  speechSynthesis.speak(speech);
+    if (data.reply) {
+      replyBox.innerText = data.reply;
+    } else {
+      replyBox.innerText = "⚠️ Reply मिळाला नाही (API response issue)";
+    }
+  } catch (err) {
+    replyBox.innerHTML = `<span class="error">Error: ${err.message}</span>`;
+  }
 }
