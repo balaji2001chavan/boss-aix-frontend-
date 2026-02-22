@@ -1,24 +1,25 @@
 async function send() {
-  const msg = document.getElementById("msg").value;
-  const replyBox = document.getElementById("reply");
+  const input = document.getElementById("msg");
+  const chat = document.getElementById("chat");
 
-  replyBox.innerText = "⏳ AIX विचार करतोय...";
+  const text = input.value.trim();
+  if (!text) return;
+
+  chat.innerHTML = "⏳ AIX विचार करत आहे...";
 
   try {
-    const res = await fetch("/api/aix/chat", {
+    const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg })
+      body: JSON.stringify({ message: text })
     });
 
     const data = await res.json();
 
-    if (data.reply) {
-      replyBox.innerText = data.reply;
-    } else {
-      replyBox.innerText = "⚠️ Reply मिळाला नाही (API response issue)";
-    }
+    chat.innerHTML = data.reply || "⚠️ काहीतरी चूक झाली";
+    input.value = "";
+
   } catch (err) {
-    replyBox.innerHTML = `<span class="error">Error: ${err.message}</span>`;
+    chat.innerHTML = "❌ Backend शी संपर्क होत नाही";
   }
 }
