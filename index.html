@@ -1,43 +1,60 @@
 <!DOCTYPE html>
-<html lang="mr">
+<html>
 <head>
-  <meta charset="UTF-8">
   <title>AIX AI</title>
+  <meta charset="UTF-8" />
   <style>
     body {
       font-family: Arial;
-      background: #f4f4f4;
-      padding: 40px;
+      background:#0f172a;
+      color:white;
+      text-align:center;
+      padding-top:60px;
     }
-    h1 { color: #222; }
+
     input {
-      width: 70%;
-      padding: 10px;
-      font-size: 16px;
+      padding:10px;
+      width:300px;
+      font-size:16px;
     }
+
     button {
-      padding: 10px 15px;
-      font-size: 16px;
-      cursor: pointer;
+      padding:10px 20px;
+      background:#22c55e;
+      border:none;
+      color:white;
+      cursor:pointer;
+      font-weight:bold;
     }
+
     #chat {
-      margin-top: 20px;
-      background: white;
-      padding: 15px;
-      min-height: 100px;
-      border-radius: 6px;
+      margin-top:30px;
+      width:60%;
+      margin-left:auto;
+      margin-right:auto;
+      text-align:left;
+      background:#020617;
+      padding:20px;
+      border-radius:10px;
+      min-height:200px;
     }
+
+    .user { color:#38bdf8; }
+    .ai { color:#22c55e; }
+    .error { color:red; }
   </style>
 </head>
+
 <body>
 
 <h1>🤖 AIX AI</h1>
 
-<input id="msg" placeholder="AIX शी बोला..." />
+<input id="msg" placeholder="AIX ला काही बोला..." />
 <button onclick="send()">Send</button>
 
-<div id="chat">AIX तयार आहे 🚀</div>
+<div id="chat"></div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
