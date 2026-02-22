@@ -1,25 +1,34 @@
 async function send() {
+
   const input = document.getElementById("msg");
   const chat = document.getElementById("chat");
 
-  const text = input.value.trim();
-  if (!text) return;
+  const message = input.value;
+  if (!message) return;
 
-  chat.innerHTML = "⏳ AIX विचार करत आहे...";
+  chat.innerHTML += `<p class="user">👤 ${message}</p>`;
+  input.value = "";
 
   try {
+
     const res = await fetch("/api/chat", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: text })
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
     });
 
     const data = await res.json();
 
-    chat.innerHTML = data.reply || "⚠️ काहीतरी चूक झाली";
-    input.value = "";
+    if (data.reply) {
+      chat.innerHTML += `<p class="ai">🤖 ${data.reply}</p>`;
+    } else {
+      chat.innerHTML += `<p class="error">⚠️ No reply from AIX</p>`;
+    }
 
   } catch (err) {
-    chat.innerHTML = "❌ Backend शी संपर्क होत नाही";
+    chat.innerHTML += `<p class="error">❌ Server Error</p>`;
+    console.error(err);
   }
 }
