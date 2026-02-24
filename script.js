@@ -1,34 +1,45 @@
-async function send() {
+const chat = document.getElementById("chat");
 
-  const input = document.getElementById("msg");
-  const chat = document.getElementById("chat");
+function addMessage(text, type){
+  const div = document.createElement("div");
+  div.className = "msg " + type;
+  div.innerText = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-  const message = input.value;
-  if (!message) return;
+async function sendMessage(){
 
-  chat.innerHTML += `<p class="user">👤 ${message}</p>`;
-  input.value = "";
+  const input = document.getElementById("message");
+  const message = input.value.trim();
 
-  try {
+  if(!message) return;
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+  addMessage(message,"user");
+  input.value="";
+
+  try{
+
+    const res = await fetch("/api/chat",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
       },
-      body: JSON.stringify({ message })
+      body:JSON.stringify({message})
     });
 
     const data = await res.json();
 
-    if (data.reply) {
-      chat.innerHTML += `<p class="ai">🤖 ${data.reply}</p>`;
-    } else {
-      chat.innerHTML += `<p class="error">⚠️ No reply from AIX</p>`;
-    }
+    addMessage(data.reply || "No reply","ai");
 
-  } catch (err) {
-    chat.innerHTML += `<p class="error">❌ Server Error</p>`;
+  }catch(err){
+    addMessage("Server error ❌","ai");
     console.error(err);
   }
 }
+
+/* ENTER key support */
+document.getElementById("message")
+.addEventListener("keypress",e=>{
+  if(e.key==="Enter") sendMessage();
+});
