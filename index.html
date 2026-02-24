@@ -1,58 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AIX AI</title>
-  <meta charset="UTF-8" />
-  <style>
-    body {
-      font-family: Arial;
-      background:#0f172a;
-      color:white;
-      text-align:center;
-      padding-top:60px;
-    }
+<meta charset="UTF-8">
+<title>AIX AI</title>
 
-    input {
-      padding:10px;
-      width:300px;
-      font-size:16px;
-    }
+<style>
 
-    button {
-      padding:10px 20px;
-      background:#22c55e;
-      border:none;
-      color:white;
-      cursor:pointer;
-      font-weight:bold;
-    }
+body{
+  margin:0;
+  font-family:Arial;
+  background:#05060f;
+  color:white;
+  overflow:hidden;
+}
 
-    #chat {
-      margin-top:30px;
-      width:60%;
-      margin-left:auto;
-      margin-right:auto;
-      text-align:left;
-      background:#020617;
-      padding:20px;
-      border-radius:10px;
-      min-height:200px;
-    }
+/* animated background */
+body::before{
+  content:"";
+  position:fixed;
+  width:200%;
+  height:200%;
+  background:radial-gradient(circle,#00ffe144,transparent);
+  animation:move 10s linear infinite;
+  z-index:-1;
+}
 
-    .user { color:#38bdf8; }
-    .ai { color:#22c55e; }
-    .error { color:red; }
-  </style>
+@keyframes move{
+  from{transform:translate(-20%,-20%)}
+  to{transform:translate(20%,20%)}
+}
+
+.container{
+  width:80%;
+  margin:auto;
+  margin-top:40px;
+  backdrop-filter:blur(20px);
+  background:#ffffff10;
+  border-radius:15px;
+  padding:20px;
+  height:80vh;
+  display:flex;
+  flex-direction:column;
+}
+
+#chat{
+  flex:1;
+  overflow:auto;
+}
+
+.msg{
+  padding:10px;
+  margin:10px 0;
+  border-radius:10px;
+}
+
+.user{background:#007bff55}
+.ai{background:#00ff9955}
+
+.input-area{
+  display:flex;
+  gap:10px;
+}
+
+input{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  outline:none;
+}
+
+button{
+  padding:12px 20px;
+  border:none;
+  border-radius:10px;
+  background:#00ffd5;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#00bfa5;
+}
+
+</style>
 </head>
 
 <body>
 
-<h1>🤖 AIX AI</h1>
+<div class="container">
 
-<input id="msg" placeholder="AIX ला काही बोला..." />
-<button onclick="send()">Send</button>
+<h2>🤖 AIX Smart AI</h2>
 
 <div id="chat"></div>
+
+<div class="input-area">
+<input id="message" placeholder="AIX ला काहीही विचार..." />
+<button onclick="sendMessage()">Send</button>
+</div>
+
+</div>
 
 <script src="script.js"></script>
 
